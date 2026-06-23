@@ -9,7 +9,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.localvoicejournal.wear"
+        applicationId = "com.localvoicejournal.app"
         minSdk = 30 // Wear OS 3.0+
         targetSdk = 37
         versionCode = 1

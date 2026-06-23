@@ -9,7 +9,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.localvoicejournal.mobile"
+        applicationId = "com.localvoicejournal.app"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
