@@ -9,6 +9,7 @@ material = "1.14.0"
 lifecycleVersion = "2.10.0"
 kotlinVersion = "1.9.20"
 playReviewVersion = "2.0.2"
+coreSplashScreen = "1.0.1"
 kotlinCompose = "2.0.0"
 firebaseVersion = "33.1.0"
 admobVersion = "23.0.0"
@@ -46,6 +47,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinVersion" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashScreen" }
 
 # Jetpack Compose (BOM)
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -104,5 +106,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVer
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinCompose" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlinVersion" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.0" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.7" }
 

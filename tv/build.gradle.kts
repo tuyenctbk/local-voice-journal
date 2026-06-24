@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -63,6 +65,14 @@ dependencies {
     // TV Compose
     implementation(libs.androidx.tv.foundation)
     implementation(libs.androidx.tv.material)
+
+    // Room
+    implementation(libs.room.runtime)
+
+    // Firebase (BOM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

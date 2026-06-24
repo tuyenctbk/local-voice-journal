@@ -30,6 +30,7 @@ import com.localvoicejournal.core.data.JournalEntry
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -450,4 +451,19 @@ fun HabitStatCard(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewDashboardScreen() {
+    DashboardScreen(
+        entries = listOf(
+            JournalEntry(1, System.currentTimeMillis(), "Today was good. Feeling productive and calm.", "LOW", listOf("Peace", "Work"), emptyList(), listOf("Exercised"), 30),
+            JournalEntry(2, System.currentTimeMillis() - 86400000, "Stressed out about the meeting tomorrow.", "HIGH", listOf("Work"), listOf("Deadlines"), emptyList(), 60)
+        ),
+        isPremium = true,
+        onEntryClick = {},
+        onBack = {},
+        onUnlockPremium = {}
+    )
 }

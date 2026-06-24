@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.ui.tooling.preview.Preview
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -279,6 +281,26 @@ fun DetailScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewDetailScreen() {
+    DetailScreen(
+        entry = JournalEntry(
+            id = 1,
+            timestamp = System.currentTimeMillis(),
+            transcript = "I had a very productive day working on the new Android features. I felt focused but slightly tired by the end.",
+            stressLevel = "MEDIUM",
+            themes = listOf("Career", "Emotional State"),
+            stressors = listOf("Deadlines"),
+            habits = listOf("Hydrated", "Exercised"),
+            durationSeconds = 45
+        ),
+        onBack = {},
+        onDelete = {},
+        onRateApp = {}
+    )
 }
 
 @Composable

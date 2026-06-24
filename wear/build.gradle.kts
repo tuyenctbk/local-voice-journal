@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -85,6 +87,11 @@ dependencies {
 
     // Play Services Wearable
     implementation(libs.play.services.wearable)
+
+    // Firebase (BOM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     // Compose icons
     implementation("androidx.compose.material:material-icons-extended")

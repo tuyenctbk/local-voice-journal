@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ object AdsHelper {
 
     @Composable
     fun BannerAd(modifier: Modifier = Modifier) {
+        val isPreview = LocalInspectionMode.current
         var isAdLoaded by remember { mutableStateOf(false) }
         val randomTip = remember { TIPS.random() }
 
@@ -41,7 +43,7 @@ object AdsHelper {
                 .background(Color(0xFF1C1A30), shape = RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
         ) {
-            if (!isAdLoaded) {
+            if (!isAdLoaded || isPreview) {
                 Text(
                     text = "TIP: $randomTip",
                     color = Color(0xFFB5B3D6),
@@ -52,25 +54,27 @@ object AdsHelper {
                 )
             }
 
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { context ->
-                    AdView(context).apply {
-                        setAdSize(AdSize.BANNER)
-                        // Use test ad unit ID
-                        adUnitId = "ca-app-pub-3940256099942544/6300978111"
-                        adListener = object : AdListener() {
-                            override fun onAdLoaded() {
-                                isAdLoaded = true
+            if (!isPreview) {
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = { context ->
+                        AdView(context).apply {
+                            setAdSize(AdSize.BANNER)
+                            // Use test ad unit ID
+                            adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                            adListener = object : AdListener() {
+                                override fun onAdLoaded() {
+                                    isAdLoaded = true
+                                }
+                                override fun onAdFailedToLoad(error: LoadAdError) {
+                                    isAdLoaded = false
+                                }
                             }
-                            override fun onAdFailedToLoad(error: LoadAdError) {
-                                isAdLoaded = false
-                            }
+                            loadAd(AdRequest.Builder().build())
                         }
-                        loadAd(AdRequest.Builder().build())
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

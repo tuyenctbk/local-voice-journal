@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.localvoicejournal.app" />
+                  <option name="mobileSdkAppId" value="1:353833941748:android:202283cc0c0e52777c7ca1" />
+                  <option name="projectId" value="aura-journal-68507" />
+                  <option name="projectNumber" value="353833941748" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

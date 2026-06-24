@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.ui.tooling.preview.Preview
+
 @Composable
 fun OnboardingScreen(
     onRequestPermission: () -> Unit,
@@ -209,3 +211,13 @@ data class OnboardingStep(
     val subtitle: String,
     val description: String
 )
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewOnboardingScreen() {
+    OnboardingScreen(
+        onRequestPermission = {},
+        hasMicrophonePermission = false,
+        onFinishOnboarding = {}
+    )
+}

@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.play.core.review.ReviewManagerFactory
 
+import androidx.compose.ui.tooling.preview.Preview
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -211,6 +213,18 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingsScreen() {
+    SettingsScreen(
+        isPremium = false,
+        onPremiumToggled = {},
+        onClearAllData = {},
+        onBack = {},
+        onRequestReview = {}
+    )
 }
 
 @Composable

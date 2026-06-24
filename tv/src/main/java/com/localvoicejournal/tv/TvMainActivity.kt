@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.*
+import androidx.compose.ui.tooling.preview.Preview
 import com.localvoicejournal.core.data.JournalDatabase
 import com.localvoicejournal.core.data.JournalEntry
 import kotlinx.coroutines.flow.collect
@@ -70,7 +71,6 @@ fun TvDashboard(entries: List<JournalEntry>) {
                     color = Color.Gray
                 )
             } else {
-                // TV Grid or Carousel could go here
                 Text(
                     text = "Latest Reflection: \"${entries.first().transcript}\"",
                     style = MaterialTheme.typography.headlineMedium,
@@ -79,4 +79,14 @@ fun TvDashboard(entries: List<JournalEntry>) {
             }
         }
     }
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+fun PreviewTvDashboard() {
+    TvDashboard(
+        entries = listOf(
+            JournalEntry(1, System.currentTimeMillis(), "Today was an amazing day for coding.", "LOW", listOf("Career"), emptyList(), emptyList(), 30)
+        )
+    )
 }

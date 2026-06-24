@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
 
 class WearMainActivity : ComponentActivity() {
 
@@ -39,15 +40,11 @@ class WearMainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            var isRecording by remember { mutableStateOf(false) }
-            var statusText by remember { mutableStateOf("Tap to record") }
-            var countdown by remember { mutableStateOf(60) }
-            val coroutineScope = rememberCoroutineScope()
-
+            val context = this
             var hasPermission by remember {
                 mutableStateOf(
                     ContextCompat.checkSelfPermission(
-                        this,
+                        context,
                         Manifest.permission.RECORD_AUDIO
                     ) == PackageManager.PERMISSION_GRANTED
                 )
@@ -59,135 +56,155 @@ class WearMainActivity : ComponentActivity() {
                 hasPermission = isGranted
             }
 
-            val triggerVibration = {
-                try {
-                    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-                    vibrator?.vibrate(60)
-                } catch (e: Exception) {
-                    // Ignore
+            WearApp(
+                hasPermission = hasPermission,
+                onRequestPermission = { requestPermission.launch(Manifest.permission.RECORD_AUDIO) },
+                triggerVibration = {
+                    try {
+                        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                        vibrator?.vibrate(60)
+                    } catch (e: Exception) { }
                 }
-            }
+            )
+        }
+    }
+}
 
-            LaunchedEffect(isRecording) {
-                if (isRecording) {
-                    countdown = 60
-                    statusText = "Listening..."
-                    while (countdown > 0 && isRecording) {
-                        delay(1000)
-                        countdown--
-                    }
-                    if (countdown == 0 && isRecording) {
-                        isRecording = false
-                        statusText = "Syncing with phone..."
-                        triggerVibration()
-                        delay(2000)
-                        statusText = "Reflected!"
-                    }
-                }
-            }
+@Composable
+fun WearApp(
+    hasPermission: Boolean,
+    onRequestPermission: () -> Unit,
+    triggerVibration: () -> Unit
+) {
+    var isRecording by remember { mutableStateOf(false) }
+    var statusText by remember { mutableStateOf("Tap to record") }
+    var countdown by remember { mutableStateOf(60) }
+    val coroutineScope = rememberCoroutineScope()
 
-            // Infinite scaling for microphone glowing aura
-            val infiniteTransition = rememberInfiniteTransition(label = "wear_pulse")
-            val pulseScale by infiniteTransition.animateFloat(
-                initialValue = 1.0f,
-                targetValue = if (isRecording) 1.3f else 1.08f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = if (isRecording) 700 else 1800, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "wearPulseScale"
+    LaunchedEffect(isRecording) {
+        if (isRecording) {
+            countdown = 60
+            statusText = "Listening..."
+            while (countdown > 0 && isRecording) {
+                delay(1000)
+                countdown--
+            }
+            if (countdown == 0 && isRecording) {
+                isRecording = false
+                statusText = "Syncing with phone..."
+                triggerVibration()
+                delay(2000)
+                statusText = "Reflected!"
+            }
+        }
+    }
+
+    // Infinite scaling for microphone glowing aura
+    val infiniteTransition = rememberInfiniteTransition(label = "wear_pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = if (isRecording) 1.3f else 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = if (isRecording) 700 else 1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "wearPulseScale"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Text(
+                text = "AURA",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFFC0B3FF),
+                letterSpacing = 2.sp
             )
 
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = if (isRecording) "00:${countdown.toString().padStart(2, '0')}" else statusText,
+                fontSize = 10.sp,
+                color = if (isRecording) Color(0xFFFF5252) else Color(0xFF9693B8),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Microphobe circle button
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(90.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    Text(
-                        text = "AURA",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFFC0B3FF),
-                        letterSpacing = 2.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = if (isRecording) "00:${countdown.toString().padStart(2, '0')}" else statusText,
-                        fontSize = 10.sp,
-                        color = if (isRecording) Color(0xFFFF5252) else Color(0xFF9693B8),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // Microphobe circle button
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(90.dp)
-                    ) {
-                        // Pulsing aura ring
-                        Box(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .scale(pulseScale)
-                                .clip(CircleShape)
-                                .background(
-                                    Brush.radialGradient(
-                                        colors = listOf(
-                                            Color(0xFF7A60FF).copy(alpha = if (isRecording) 0.35f else 0.15f),
-                                            Color.Transparent
-                                        )
-                                    )
+                // Pulsing aura ring
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .scale(pulseScale)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.radialGradient(
+                                colors = listOf(
+                                    Color(0xFF7A60FF).copy(alpha = if (isRecording) 0.35f else 0.15f),
+                                    Color.Transparent
                                 )
-                        )
-
-                        // Main action circle
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(56.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (isRecording) Color(0xFFFF5252) else Color(0xFF7A60FF)
-                                )
-                                .clickable {
-                                    triggerVibration()
-                                    if (!hasPermission) {
-                                        requestPermission.launch(Manifest.permission.RECORD_AUDIO)
-                                    } else {
-                                        if (isRecording) {
-                                            isRecording = false
-                                            coroutineScope.launch {
-                                                statusText = "Syncing..."
-                                                delay(1500)
-                                                statusText = "Reflected!"
-                                                delay(2000)
-                                                statusText = "Tap to record"
-                                            }
-                                        } else {
-                                            isRecording = true
-                                        }
-                                    }
-                                }
-                        ) {
-                            Icon(
-                                imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                                contentDescription = if (isRecording) "Stop reflection" else "Start reflection",
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
                             )
+                        )
+                )
+
+                // Main action circle
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isRecording) Color(0xFFFF5252) else Color(0xFF7A60FF)
+                        )
+                        .clickable {
+                            triggerVibration()
+                            if (!hasPermission) {
+                                onRequestPermission()
+                            } else {
+                                if (isRecording) {
+                                    isRecording = false
+                                    coroutineScope.launch {
+                                        statusText = "Syncing..."
+                                        delay(1500)
+                                        statusText = "Reflected!"
+                                        delay(2000)
+                                        statusText = "Tap to record"
+                                    }
+                                } else {
+                                    isRecording = true
+                                }
+                            }
                         }
-                    }
+                ) {
+                    Icon(
+                        imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
+                        contentDescription = if (isRecording) "Stop reflection" else "Start reflection",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
     }
+}
+
+@Preview(device = "id:wearos_large_round", showSystemUi = true)
+@Composable
+fun PreviewWearApp() {
+    WearApp(hasPermission = true, onRequestPermission = {}, triggerVibration = {})
 }

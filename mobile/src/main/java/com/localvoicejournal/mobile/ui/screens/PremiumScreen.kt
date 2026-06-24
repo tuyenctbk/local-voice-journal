@@ -3,6 +3,7 @@ package com.localvoicejournal.mobile.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,19 +22,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PremiumScreen(
     onClose: () -> Unit,
     onSubscribeSuccess: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF0F0C20),
-            Color(0xFF1B143F), // Lighter purple highlight
+            Color(0xFF1E1A3D),
             Color(0xFF0A0915)
         )
     )
@@ -50,129 +52,99 @@ fun PremiumScreen(
                 .navigationBarsPadding()
                 .verticalScroll(scrollState)
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Close header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
+            // Close Button
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 IconButton(onClick = onClose) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close paywall",
-                        tint = Color.White
-                    )
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close", tint = Color.White)
                 }
             }
 
-            // Top Content
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "AURA PREMIUM",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFFC0B3FF),
-                    letterSpacing = 4.sp
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Text(
-                    text = "Unlock the full power of offline reflection",
-                    fontSize = 15.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(32.dp))
+            // Header
+            Text(
+                text = "AURA PREMIUM",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFFC0B3FF),
+                letterSpacing = 3.sp
+            )
 
-            // Premium Features List
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                PremiumFeatureItem(
-                    title = "Weekly Stress Trends",
-                    description = "Access interactive timeline graphs tracking your emotional and stress level distributions over time."
-                )
-                PremiumFeatureItem(
-                    title = "Encrypted Local Backups",
-                    description = "Export and import your SQLite database locally with passcode encryption to ensure data survival."
-                )
-                PremiumFeatureItem(
-                    title = "Advanced AI Themes",
-                    description = "Unlock granular local theme categorizations and smart sleep/work stress suggestions."
-                )
-                PremiumFeatureItem(
-                    title = "Zero Ad Placement",
-                    description = "Enjoy a completely clean interface with all AdMob promotional placeholder cards fully removed."
-                )
-            }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Deepen Your Self-Understanding",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Features
+            PremiumFeatureItem(
+                title = "Advanced Emotional Trends",
+                description = "See how your stress levels correlate with work and habits over months, not just days."
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            PremiumFeatureItem(
+                title = "Habit-Stressor Correlation",
+                description = "Our local AI identifies which habits (like sleep or water) most effectively reduce your specific stressors."
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            PremiumFeatureItem(
+                title = "Secure Cloud Backup",
+                description = "Optional encrypted backup to your private cloud storage to keep history across devices."
+            )
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Pricing & Action Button
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "$3.99 / month",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Color.White
-                )
-                Text(
-                    text = "Cancel anytime. Billed locally.",
-                    fontSize = 12.sp,
-                    color = Color(0xFF8682A8),
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        Toast.makeText(context, "Aura Premium Activated!", Toast.LENGTH_SHORT).show()
+            // Subscription Option
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color(0xFF7A60FF))
+                    .clickable {
                         onSubscribeSuccess()
-                        onClose()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A60FF)),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Text(
-                        text = "Subscribe Now",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TextButton(
-                    onClick = {
-                        Toast.makeText(context, "Purchases restored.", Toast.LENGTH_SHORT).show()
-                        onSubscribeSuccess()
+                        Toast.makeText(context, "Aura Premium Unlocked! (Simulation)", Toast.LENGTH_LONG).show()
                         onClose()
                     }
-                ) {
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Restore Purchase",
-                        color = Color(0xFF9693B8),
-                        fontSize = 13.sp
+                        text = "$3.99 / Month",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Start 7-day free trial",
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontWeight = FontWeight.Medium
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            TextButton(onClick = { /* Restore purchases */ }) {
+                Text(
+                    text = "Restore Purchases",
+                    color = Color(0xFF9693B8),
+                    fontSize = 13.sp
+                )
             }
         }
     }
@@ -212,4 +184,10 @@ fun PremiumFeatureItem(title: String, description: String) {
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPremiumScreen() {
+    PremiumScreen(onClose = {}, onSubscribeSuccess = {})
 }
