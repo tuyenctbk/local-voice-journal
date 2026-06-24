@@ -26,3 +26,4 @@ rootProject.name = "AuraJournal"
 include(":core")
 include(":mobile")
 include(":wear")
+include(":tv")

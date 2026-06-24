@@ -38,7 +38,8 @@ fun DashboardScreen(
     isPremium: Boolean,
     onEntryClick: (JournalEntry) -> Unit,
     onBack: () -> Unit,
-    onUnlockPremium: () -> Unit
+    onUnlockPremium: () -> Unit,
+    showBackButton: Boolean = true
 ) {
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
@@ -61,12 +62,14 @@ fun DashboardScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Go back",
-                            tint = Color.White
-                        )
+                    if (showBackButton) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Go back",
+                                tint = Color.White
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -75,12 +75,19 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
+    // Adaptive
+    implementation("androidx.compose.material3:material3-window-size-class")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material3.windowsize)
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.viewmodel.compose)
 

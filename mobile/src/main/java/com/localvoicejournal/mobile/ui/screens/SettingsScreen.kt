@@ -31,7 +31,8 @@ fun SettingsScreen(
     onPremiumToggled: (Boolean) -> Unit,
     onClearAllData: () -> Unit,
     onBack: () -> Unit,
-    onRequestReview: () -> Unit
+    onRequestReview: () -> Unit,
+    showBackButton: Boolean = true
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -85,12 +86,14 @@ fun SettingsScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Go back",
-                            tint = Color.White
-                        )
+                    if (showBackButton) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Go back",
+                                tint = Color.White
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

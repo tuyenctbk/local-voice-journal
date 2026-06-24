@@ -11,11 +11,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -47,6 +54,7 @@ class MainActivity : ComponentActivity() {
     private val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
     private val KEY_PREMIUM = "premium_unlocked"
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,6 +64,9 @@ class MainActivity : ComponentActivity() {
         aiAnalyzer = OnDeviceModelAnalyzer(this)
 
         setContent {
+            val windowSizeClass = calculateWindowSizeClass(this)
+            val useRail = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+
             var currentScreen by remember {
                 mutableStateOf(
                     if (sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETE, false)) {
@@ -129,143 +140,205 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                Crossfade(targetState = currentScreen, label = "screen_nav") { screen ->
-                    when (screen) {
-                        AppScreen.ONBOARDING -> {
-                            OnboardingScreen(
-                                onRequestPermission = {
-                                    requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                                },
-                                hasMicrophonePermission = hasMicPermission,
-                                onFinishOnboarding = {
-                                    sharedPreferences.edit().putBoolean(KEY_ONBOARDING_COMPLETE, true).apply()
-                                    currentScreen = AppScreen.HOME
-                                }
+                Row(modifier = Modifier.fillMaxSize()) {
+                    if (useRail && currentScreen != AppScreen.ONBOARDING) {
+                        NavigationRail(
+                            containerColor = Color(0xFF141225),
+                            contentColor = Color(0xFFC0B3FF),
+                            header = {
+                                Text(
+                                    "AURA",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFC0B3FF),
+                                    modifier = Modifier.padding(vertical = 16.dp)
+                                )
+                            }
+                        ) {
+                            NavigationRailItem(
+                                selected = currentScreen == AppScreen.HOME,
+                                onClick = { currentScreen = AppScreen.HOME },
+                                icon = { Icon(Icons.Default.Mic, contentDescription = "Home") },
+                                label = { Text("Home") },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = Color.White,
+                                    selectedTextColor = Color.White,
+                                    unselectedIconColor = Color(0xFF8682A8),
+                                    unselectedTextColor = Color(0xFF8682A8),
+                                    indicatorColor = Color(0xFF7A60FF)
+                                )
+                            )
+                            NavigationRailItem(
+                                selected = currentScreen == AppScreen.DASHBOARD || currentScreen == AppScreen.DETAIL,
+                                onClick = { currentScreen = AppScreen.DASHBOARD },
+                                icon = { Icon(Icons.Default.History, contentDescription = "History") },
+                                label = { Text("History") },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = Color.White,
+                                    selectedTextColor = Color.White,
+                                    unselectedIconColor = Color(0xFF8682A8),
+                                    unselectedTextColor = Color(0xFF8682A8),
+                                    indicatorColor = Color(0xFF7A60FF)
+                                )
+                            )
+                            NavigationRailItem(
+                                selected = currentScreen == AppScreen.SETTINGS,
+                                onClick = { currentScreen = AppScreen.SETTINGS },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                                label = { Text("Settings") },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = Color.White,
+                                    selectedTextColor = Color.White,
+                                    unselectedIconColor = Color(0xFF8682A8),
+                                    unselectedTextColor = Color(0xFF8682A8),
+                                    indicatorColor = Color(0xFF7A60FF)
+                                )
                             )
                         }
+                    }
 
-                        AppScreen.HOME -> {
-                            HomeScreen(
-                                isRecording = isRecording,
-                                statusText = statusText,
-                                liveTranscript = liveTranscript,
-                                soundLevel = soundLevel,
-                                onStartRecording = {
-                                    if (hasMicPermission) {
-                                        sttManager.startListening()
-                                    } else {
-                                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                                    }
-                                },
-                                onStopRecording = {
-                                    sttManager.stopListening()
-                                    // Complete and save to DB
-                                    lifecycleScope.launch {
-                                        val transcript = sttManager.transcript.value
-                                        if (transcript.isNotEmpty()) {
-                                            val analysisResult = aiAnalyzer.analyze(transcript)
-                                            val newEntry = JournalEntry(
-                                                timestamp = System.currentTimeMillis(),
-                                                transcript = transcript,
-                                                stressLevel = analysisResult.stressLevel,
-                                                themes = analysisResult.themes,
-                                                stressors = analysisResult.stressors,
-                                                habits = analysisResult.habits,
-                                                durationSeconds = 60 // Simulated max duration
-                                            )
-                                            val id = database.journalDao().insertEntry(newEntry)
-                                            
-                                            // Automatically open newly saved entry detail
-                                            database.journalDao().getEntryById(id).first()?.let { saved ->
-                                                selectedEntry = saved
-                                                currentScreen = AppScreen.DETAIL
+                    Box(modifier = Modifier.weight(1f)) {
+                        Crossfade(targetState = currentScreen, label = "screen_nav") { screen ->
+                            when (screen) {
+                                AppScreen.ONBOARDING -> {
+                                    OnboardingScreen(
+                                        onRequestPermission = {
+                                            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                        },
+                                        hasMicrophonePermission = hasMicPermission,
+                                        onFinishOnboarding = {
+                                            sharedPreferences.edit().putBoolean(KEY_ONBOARDING_COMPLETE, true).apply()
+                                            currentScreen = AppScreen.HOME
+                                        }
+                                    )
+                                }
+
+                                AppScreen.HOME -> {
+                                    HomeScreen(
+                                        isRecording = isRecording,
+                                        statusText = statusText,
+                                        liveTranscript = liveTranscript,
+                                        soundLevel = soundLevel,
+                                        onStartRecording = {
+                                            if (hasMicPermission) {
+                                                sttManager.startListening()
+                                            } else {
+                                                requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                                             }
-                                        } else {
-                                            Toast.makeText(this@MainActivity, "No transcription captured.", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                },
-                                onNavigateToHistory = {
-                                    currentScreen = AppScreen.DASHBOARD
-                                },
-                                onNavigateToSettings = {
-                                    currentScreen = AppScreen.SETTINGS
-                                },
-                                onNavigateToPremium = {
-                                    currentScreen = AppScreen.PREMIUM
-                                }
-                            )
-                        }
-
-                        AppScreen.DETAIL -> {
-                            DetailScreen(
-                                entry = selectedEntry,
-                                onBack = {
-                                    currentScreen = AppScreen.DASHBOARD
-                                },
-                                onDelete = {
-                                    selectedEntry?.let {
-                                        lifecycleScope.launch {
-                                            database.journalDao().deleteEntry(it)
-                                            Toast.makeText(this@MainActivity, "Reflection deleted.", Toast.LENGTH_SHORT).show()
+                                        },
+                                        onStopRecording = {
+                                            sttManager.stopListening()
+                                            // Complete and save to DB
+                                            lifecycleScope.launch {
+                                                val transcript = sttManager.transcript.value
+                                                if (transcript.isNotEmpty()) {
+                                                    val analysisResult = aiAnalyzer.analyze(transcript)
+                                                    val newEntry = JournalEntry(
+                                                        timestamp = System.currentTimeMillis(),
+                                                        transcript = transcript,
+                                                        stressLevel = analysisResult.stressLevel,
+                                                        themes = analysisResult.themes,
+                                                        stressors = analysisResult.stressors,
+                                                        habits = analysisResult.habits,
+                                                        durationSeconds = 60 // Simulated max duration
+                                                    )
+                                                    val id = database.journalDao().insertEntry(newEntry)
+                                                    
+                                                    // Automatically open newly saved entry detail
+                                                    database.journalDao().getEntryById(id).first()?.let { saved ->
+                                                        selectedEntry = saved
+                                                        currentScreen = AppScreen.DETAIL
+                                                    }
+                                                } else {
+                                                    Toast.makeText(this@MainActivity, "No transcription captured.", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        },
+                                        onNavigateToHistory = {
                                             currentScreen = AppScreen.DASHBOARD
+                                        },
+                                        onNavigateToSettings = {
+                                            currentScreen = AppScreen.SETTINGS
+                                        },
+                                        onNavigateToPremium = {
+                                            currentScreen = AppScreen.PREMIUM
+                                        },
+                                        showBottomBar = !useRail
+                                    )
+                                }
+
+                                AppScreen.DETAIL -> {
+                                    DetailScreen(
+                                        entry = selectedEntry,
+                                        onBack = {
+                                            currentScreen = AppScreen.DASHBOARD
+                                        },
+                                        onDelete = {
+                                            selectedEntry?.let {
+                                                lifecycleScope.launch {
+                                                    database.journalDao().deleteEntry(it)
+                                                    Toast.makeText(this@MainActivity, "Reflection deleted.", Toast.LENGTH_SHORT).show()
+                                                    currentScreen = AppScreen.DASHBOARD
+                                                }
+                                            }
+                                        },
+                                        onRateApp = {
+                                            triggerInAppReview()
                                         }
-                                    }
-                                },
-                                onRateApp = {
-                                    triggerInAppReview()
+                                    )
                                 }
-                            )
-                        }
 
-                        AppScreen.DASHBOARD -> {
-                            DashboardScreen(
-                                entries = journalEntries,
-                                isPremium = isPremium,
-                                onEntryClick = { entry ->
-                                    selectedEntry = entry
-                                    currentScreen = AppScreen.DETAIL
-                                },
-                                onBack = {
-                                    currentScreen = AppScreen.HOME
-                                },
-                                onUnlockPremium = {
-                                    currentScreen = AppScreen.PREMIUM
+                                AppScreen.DASHBOARD -> {
+                                    DashboardScreen(
+                                        entries = journalEntries,
+                                        isPremium = isPremium,
+                                        onEntryClick = { entry ->
+                                            selectedEntry = entry
+                                            currentScreen = AppScreen.DETAIL
+                                        },
+                                        onBack = {
+                                            currentScreen = AppScreen.HOME
+                                        },
+                                        onUnlockPremium = {
+                                            currentScreen = AppScreen.PREMIUM
+                                        },
+                                        showBackButton = !useRail
+                                    )
                                 }
-                            )
-                        }
 
-                        AppScreen.PREMIUM -> {
-                            PremiumScreen(
-                                onClose = {
-                                    currentScreen = AppScreen.HOME
-                                },
-                                onSubscribeSuccess = {
-                                    isPremium = true
-                                    sharedPreferences.edit().putBoolean(KEY_PREMIUM, true).apply()
+                                AppScreen.PREMIUM -> {
+                                    PremiumScreen(
+                                        onClose = {
+                                            currentScreen = AppScreen.HOME
+                                        },
+                                        onSubscribeSuccess = {
+                                            isPremium = true
+                                            sharedPreferences.edit().putBoolean(KEY_PREMIUM, true).apply()
+                                        }
+                                    )
                                 }
-                            )
-                        }
 
-                        AppScreen.SETTINGS -> {
-                            SettingsScreen(
-                                isPremium = isPremium,
-                                onPremiumToggled = { enabled ->
-                                    isPremium = enabled
-                                    sharedPreferences.edit().putBoolean(KEY_PREMIUM, enabled).apply()
-                                },
-                                onClearAllData = {
-                                    lifecycleScope.launch {
-                                        database.journalDao().clearAllEntries()
-                                    }
-                                },
-                                onBack = {
-                                    currentScreen = AppScreen.HOME
-                                },
-                                onRequestReview = {
-                                    triggerInAppReview()
+                                AppScreen.SETTINGS -> {
+                                    SettingsScreen(
+                                        isPremium = isPremium,
+                                        onPremiumToggled = { enabled ->
+                                            isPremium = enabled
+                                            sharedPreferences.edit().putBoolean(KEY_PREMIUM, enabled).apply()
+                                        },
+                                        onClearAllData = {
+                                            lifecycleScope.launch {
+                                                database.journalDao().clearAllEntries()
+                                            }
+                                        },
+                                        onBack = {
+                                            currentScreen = AppScreen.HOME
+                                        },
+                                        onRequestReview = {
+                                            triggerInAppReview()
+                                        },
+                                        showBackButton = !useRail
+                                    )
                                 }
-                            )
+                            }
                         }
                     }
                 }

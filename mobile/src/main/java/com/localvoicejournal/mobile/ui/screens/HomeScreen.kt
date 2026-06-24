@@ -37,7 +37,8 @@ fun HomeScreen(
     onStopRecording: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToPremium: () -> Unit
+    onNavigateToPremium: () -> Unit,
+    showBottomBar: Boolean = true
 ) {
     val context = LocalContext.current
     var recordingSeconds by remember { mutableStateOf(60) }
@@ -246,38 +247,40 @@ fun HomeScreen(
             )
 
             // Bottom Navigation Bar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .background(Color(0xFF141225).copy(alpha = 0.8f), shape = RoundedCornerShape(20.dp))
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextButton(onClick = onNavigateToHistory) {
-                    Text(
-                        text = "History",
-                        color = Color(0xFFC0B3FF),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                }
-
-                Box(
+            if (showBottomBar) {
+                Row(
                     modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF4C4670))
-                )
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .background(Color(0xFF141225).copy(alpha = 0.8f), shape = RoundedCornerShape(20.dp))
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onNavigateToHistory) {
+                        Text(
+                            text = "History",
+                            color = Color(0xFFC0B3FF),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
 
-                TextButton(onClick = onNavigateToSettings) {
-                    Text(
-                        text = "Settings",
-                        color = Color(0xFF9693B8),
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF4C4670))
                     )
+
+                    TextButton(onClick = onNavigateToSettings) {
+                        Text(
+                            text = "Settings",
+                            color = Color(0xFF9693B8),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
         }
