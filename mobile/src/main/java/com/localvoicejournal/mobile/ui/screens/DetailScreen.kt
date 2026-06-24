@@ -271,8 +271,8 @@ fun DetailScreen(
                         )
                     }
 
-                    // AdMob Ads Placeholder Card
-                    AdMobBannerPlaceholder()
+                    // AdMob Banner Ad
+                    com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
                     
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -305,34 +305,6 @@ fun GlassCard(
                 letterSpacing = 1.sp
             )
             content()
-        }
-    }
-}
-
-@Composable
-fun AdMobBannerPlaceholder() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF1D1B2D))
-            .border(1.dp, Color(0xFF2C2A44), RoundedCornerShape(8.dp)),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "AdMob Banner Placeholder",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF6B6888),
-                letterSpacing = 1.sp
-            )
-            Text(
-                text = "ca-app-pub-3940256099942544/6300978111",
-                fontSize = 9.sp,
-                color = Color(0xFF4C4A63)
-            )
         }
     }
 }

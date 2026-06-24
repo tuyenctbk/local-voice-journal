@@ -327,6 +327,10 @@ fun DashboardScreen(
                         }
                     }
                 }
+
+                item {
+                    com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                }
             }
         }
     }

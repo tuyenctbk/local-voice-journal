@@ -103,13 +103,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // Simulate Remote Config check
+            // Real Remote Config check
             LaunchedEffect(Unit) {
-                kotlinx.coroutines.delay(3000)
-                val minRequiredVersion = 2
-                val currentVersionCode = 1
-                if (minRequiredVersion > currentVersionCode) {
-                    showUpdateDialog = true
+                com.localvoicejournal.mobile.util.RemoteConfigHelper.fetchAndActivate {
+                    val minRequiredVersion = com.localvoicejournal.mobile.util.RemoteConfigHelper.getMinVersionCode()
+                    val currentVersionCode = try {
+                        packageManager.getPackageInfo(packageName, 0).versionCode
+                    } catch (e: Exception) {
+                        1
+                    }
+                    if (minRequiredVersion > currentVersionCode) {
+                        showUpdateDialog = true
+                    }
                 }
             }
 

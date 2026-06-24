@@ -240,6 +240,11 @@ fun HomeScreen(
                 }
             }
 
+            // Ad Banner Placeholder
+            com.localvoicejournal.mobile.util.AdsHelper.BannerAd(
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             // Bottom Navigation Bar
             Row(
                 modifier = Modifier

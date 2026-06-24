@@ -197,14 +197,14 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Version 1.0.0 (Local Build)\nFirebase & AdMob Mock integration enabled.",
+                        text = "Version 1.0.0 (Local Build)\nFirebase & AdMob active.",
                         color = Color(0xFF6B6888),
                         fontSize = 11.sp,
                         lineHeight = 16.sp
                     )
                 }
 
-                AdMobBannerPlaceholder()
+                com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
             }
         }
     }
