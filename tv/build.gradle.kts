@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.localvoicejournal.app"
-        minSdk = 21 // Android TV 5.0+
+        minSdk = 24 // Android TV 7.0+ (Matches :core requirements)
         targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core"))
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.kotlin.stdlib)
 
     // Lifecycle
