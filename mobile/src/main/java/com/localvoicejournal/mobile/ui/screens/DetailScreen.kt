@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun DetailScreen(
     entry: JournalEntry?,
+    isPremium: Boolean = false,
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onRateApp: () -> Unit
@@ -69,11 +70,54 @@ fun DetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onDelete) {
+                    var showDeleteConfirm by remember { mutableStateOf(false) }
+                    
+                    IconButton(onClick = { showDeleteConfirm = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete entry",
                             tint = Color(0xFFFF5252)
+                        )
+                    }
+
+                    if (showDeleteConfirm) {
+                        AlertDialog(
+                            onDismissRequest = { showDeleteConfirm = false },
+                            title = {
+                                Text(
+                                    text = "Delete Reflection?",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "Are you sure you want to permanently erase this reflection from your device? This action cannot be undone.",
+                                    color = Color(0xFFB0AFC0),
+                                    fontSize = 14.sp,
+                                    lineHeight = 20.sp
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        showDeleteConfirm = false
+                                        onDelete()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Delete", color = Color.White)
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDeleteConfirm = false }) {
+                                    Text("Cancel", color = Color(0xFFB0AFC0))
+                                }
+                            },
+                            containerColor = Color(0xFF1C1A30),
+                            shape = RoundedCornerShape(16.dp)
                         )
                     }
                 },
@@ -274,7 +318,9 @@ fun DetailScreen(
                     }
 
                     // AdMob Banner Ad
-                    com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                    if (!isPremium) {
+                        com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                    }
                     
                     Spacer(modifier = Modifier.height(20.dp))
                 }

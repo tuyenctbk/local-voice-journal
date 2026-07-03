@@ -118,6 +118,39 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            fun saveReflection(transcript: String, durationSeconds: Int) {
+                lifecycleScope.launch {
+                    val analysisResult = aiAnalyzer.analyze(transcript)
+                    val newEntry = JournalEntry(
+                        timestamp = System.currentTimeMillis(),
+                        transcript = transcript,
+                        stressLevel = analysisResult.stressLevel,
+                        themes = analysisResult.themes,
+                        stressors = analysisResult.stressors,
+                        habits = analysisResult.habits,
+                        durationSeconds = durationSeconds
+                    )
+                    val id = database.journalDao().insertEntry(newEntry)
+                    
+                    // Automatically open newly saved entry detail
+                    database.journalDao().getEntryById(id).first()?.let { saved ->
+                        selectedEntry = saved
+                        currentScreen = AppScreen.DETAIL
+                    }
+                }
+            }
+
+            // Observe finalized STT transcripts
+            LaunchedEffect(Unit) {
+                sttManager.onTranscriptReady.collect { transcript ->
+                    if (transcript.isNotEmpty()) {
+                        saveReflection(transcript, 60)
+                    } else {
+                        Toast.makeText(this@MainActivity, "No transcription captured.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
             // Real Remote Config check
             LaunchedEffect(Unit) {
                 com.localvoicejournal.mobile.util.RemoteConfigHelper.fetchAndActivate {
@@ -135,6 +168,7 @@ class MainActivity : ComponentActivity() {
 
             // STT Manager states
             val isRecording by sttManager.isRecording.collectAsState()
+            val isProcessing by sttManager.isProcessing.collectAsState()
             val statusText by sttManager.status.collectAsState()
             val liveTranscript by sttManager.transcript.collectAsState()
             val soundLevel by sttManager.soundLevel.collectAsState()
@@ -219,6 +253,8 @@ class MainActivity : ComponentActivity() {
                                 AppScreen.HOME -> {
                                     HomeScreen(
                                         isRecording = isRecording,
+                                        isProcessing = isProcessing,
+                                        isPremium = isPremium,
                                         statusText = statusText,
                                         liveTranscript = liveTranscript,
                                         soundLevel = soundLevel,
@@ -231,31 +267,12 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onStopRecording = {
                                             sttManager.stopListening()
-                                            // Complete and save to DB
-                                            lifecycleScope.launch {
-                                                val transcript = sttManager.transcript.value
-                                                if (transcript.isNotEmpty()) {
-                                                    val analysisResult = aiAnalyzer.analyze(transcript)
-                                                    val newEntry = JournalEntry(
-                                                        timestamp = System.currentTimeMillis(),
-                                                        transcript = transcript,
-                                                        stressLevel = analysisResult.stressLevel,
-                                                        themes = analysisResult.themes,
-                                                        stressors = analysisResult.stressors,
-                                                        habits = analysisResult.habits,
-                                                        durationSeconds = 60 // Simulated max duration
-                                                    )
-                                                    val id = database.journalDao().insertEntry(newEntry)
-                                                    
-                                                    // Automatically open newly saved entry detail
-                                                    database.journalDao().getEntryById(id).first()?.let { saved ->
-                                                        selectedEntry = saved
-                                                        currentScreen = AppScreen.DETAIL
-                                                    }
-                                                } else {
-                                                    Toast.makeText(this@MainActivity, "No transcription captured.", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
+                                        },
+                                        onSaveManualReflection = { text ->
+                                            saveReflection(text, 0)
+                                        },
+                                        onCancelRecording = {
+                                            sttManager.cancelListening()
                                         },
                                         onNavigateToHistory = {
                                             currentScreen = AppScreen.DASHBOARD
@@ -273,6 +290,7 @@ class MainActivity : ComponentActivity() {
                                 AppScreen.DETAIL -> {
                                     DetailScreen(
                                         entry = selectedEntry,
+                                        isPremium = isPremium,
                                         onBack = {
                                             currentScreen = AppScreen.DASHBOARD
                                         },
@@ -333,6 +351,9 @@ class MainActivity : ComponentActivity() {
                                                 database.journalDao().clearAllEntries()
                                             }
                                         },
+                                        onExportBackup = {
+                                            exportBackup()
+                                        },
                                         onBack = {
                                             currentScreen = AppScreen.HOME
                                         },
@@ -388,6 +409,66 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 Toast.makeText(this, "Review suggestion complete (Simulation)", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun exportBackup() {
+        lifecycleScope.launch {
+            try {
+                val entries = database.journalDao().getAllEntriesList()
+                if (entries.isEmpty()) {
+                    Toast.makeText(this@MainActivity, "No journal entries to export.", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                
+                // Convert list to simple JSON array
+                val jsonBuilder = StringBuilder()
+                jsonBuilder.append("[\n")
+                entries.forEachIndexed { index, entry ->
+                    val themesJson = entry.themes.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val stressorsJson = entry.stressors.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val habitsJson = entry.habits.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    
+                    jsonBuilder.append("  {\n")
+                    jsonBuilder.append("    \"id\": ${entry.id},\n")
+                    jsonBuilder.append("    \"timestamp\": ${entry.timestamp},\n")
+                    jsonBuilder.append("    \"transcript\": \"${entry.transcript.replace("\"", "\\\"").replace("\n", "\\n")}\",\n")
+                    jsonBuilder.append("    \"stressLevel\": \"${entry.stressLevel}\",\n")
+                    jsonBuilder.append("    \"themes\": [$themesJson],\n")
+                    jsonBuilder.append("    \"stressors\": [$stressorsJson],\n")
+                    jsonBuilder.append("    \"habits\": [$habitsJson],\n")
+                    jsonBuilder.append("    \"durationSeconds\": ${entry.durationSeconds}\n")
+                    jsonBuilder.append("  }")
+                    if (index < entries.size - 1) {
+                        jsonBuilder.append(",")
+                    }
+                    jsonBuilder.append("\n")
+                }
+                jsonBuilder.append("]")
+                
+                val jsonString = jsonBuilder.toString()
+                
+                // Write json to a temp file in cache
+                val backupFile = java.io.File(cacheDir, "aurajournal_backup.json")
+                backupFile.writeText(jsonString)
+                
+                // Share file using FileProvider
+                val contentUri = androidx.core.content.FileProvider.getUriForFile(
+                    this@MainActivity,
+                    "${packageName}.fileprovider",
+                    backupFile
+                )
+                
+                val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "application/json"
+                    putExtra(android.content.Intent.EXTRA_STREAM, contentUri)
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                
+                startActivity(android.content.Intent.createChooser(shareIntent, "Export Backup JSON"))
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

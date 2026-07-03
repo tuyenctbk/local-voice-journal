@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">DÜŞÜNCELERİNİ KAYDET</string>
+    <string name="tap_to_record_max">Kaydetmek için dokun (maks 60sn)</string>
+    <string name="history">Geçmiş</string>
+    <string name="settings">Ayarlar</string>
+    <string name="premium">Premium</string>
+    <string name="next">İleri</string>
+    <string name="back">Geri</string>
+    <string name="get_started">Başla</string>
+    <string name="onboarding_welcome">Sadece 60 saniye konuşarak günlük düşüncelerinizi kaydedebileceğiniz minimal, sakin bir alana hoş geldiniz.</string>
+    <string name="privacy_first">100% Gizlilik Odaklı</string>
+    <string name="mic_permission_required">Düşüncelerinizi yazıya dökmek için mikrofon izni gereklidir.</string>
+    <string name="stress_level">Stres Seviyesi</string>
+    <string name="low_calm">DÜŞÜK (Sakin)</string>
+    <string name="medium">ORTA</string>
+    <string name="high_stress">YÜKSEK (Stresli)</string>
+</resources>

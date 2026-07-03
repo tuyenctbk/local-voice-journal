@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">CHẠM ĐỂ SUY NGẪM</string>
+    <string name="tap_to_record_max">Chạm để ghi âm (tối đa 60 giây)</string>
+    <string name="history">Lịch sử</string>
+    <string name="settings">Cài đặt</string>
+    <string name="premium">Cao cấp</string>
+    <string name="next">Tiếp theo</string>
+    <string name="back">Quay lại</string>
+    <string name="get_started">Bắt đầu</string>
+    <string name="onboarding_welcome">Chào mừng bạn đến với không gian tối giản, thân thiện với cảm quan, nơi bạn có thể ghi lại những suy nghĩ hàng ngày bằng cách nói trong 60 giây.</string>
+    <string name="privacy_first">100% Quyền riêng tư là trên hết</string>
+    <string name="mic_permission_required">Cần có quyền truy cập micrô để chuyển đổi suy nghĩ của bạn thành văn bản.</string>
+    <string name="stress_level">Mức độ căng thẳng</string>
+    <string name="low_calm">THẤP (Bình tĩnh)</string>
+    <string name="medium">TRUNG BÌNH</string>
+    <string name="high_stress">CAO (Căng thẳng)</string>
+</resources>

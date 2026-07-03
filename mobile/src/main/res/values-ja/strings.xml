@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">タップして振り返る</string>
+    <string name="tap_to_record_max">タップして記録 (最大60秒)</string>
+    <string name="history">履歴</string>
+    <string name="settings">設定</string>
+    <string name="premium">プレミアム</string>
+    <string name="next">次へ</string>
+    <string name="back">戻る</string>
+    <string name="get_started">始める</string>
+    <string name="onboarding_welcome">感覚に優しく、ミニマルな空間へようこそ。わずか60秒話すだけで、日々の考えを記録できます。</string>
+    <string name="privacy_first">100% プライバシー優先</string>
+    <string name="mic_permission_required">音声を文字に変換するためにマイクの許可が必要です。</string>
+    <string name="stress_level">ストレスレベル</string>
+    <string name="low_calm">低 (穏やか)</string>
+    <string name="medium">中</string>
+    <string name="high_stress">高 (ストレス)</string>
+</resources>

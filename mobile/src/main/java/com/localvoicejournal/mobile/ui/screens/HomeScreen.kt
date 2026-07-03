@@ -23,22 +23,28 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import com.localvoicejournal.mobile.R
 
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun HomeScreen(
     isRecording: Boolean,
+    isProcessing: Boolean = false,
+    isPremium: Boolean = false,
     statusText: String,
     liveTranscript: String,
     soundLevel: Float,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
+    onSaveManualReflection: (String) -> Unit = {},
+    onCancelRecording: () -> Unit = {},
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToPremium: () -> Unit,
@@ -150,10 +156,18 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = if (isRecording) "00:${recordingSeconds.toString().padStart(2, '0')}" else "TAP TO REFLECT",
+                    text = when {
+                        isProcessing -> "PROCESSING..."
+                        isRecording -> "00:${recordingSeconds.toString().padStart(2, '0')}"
+                        else -> stringResource(R.string.tap_to_reflect)
+                    },
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isRecording) Color(0xFFFF7B7B) else Color(0xFF908DB5),
+                    color = when {
+                        isProcessing -> Color(0xFFC0B3FF)
+                        isRecording -> Color(0xFFFF7B7B)
+                        else -> Color(0xFF908DB5)
+                    },
                     letterSpacing = 2.sp
                 )
 
@@ -188,7 +202,9 @@ fun HomeScreen(
                             .clip(CircleShape)
                             .background(
                                 Brush.linearGradient(
-                                    colors = if (isRecording) {
+                                    colors = if (isProcessing) {
+                                        listOf(Color(0xFF4C3E9E), Color(0xFF7A60FF))
+                                    } else if (isRecording) {
                                         listOf(Color(0xFFFF5252), Color(0xFFFF8A80))
                                     } else {
                                         listOf(Color(0xFF7A60FF), Color(0xFFC0B3FF))
@@ -196,6 +212,7 @@ fun HomeScreen(
                                 )
                             )
                             .clickable(
+                                enabled = !isProcessing,
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
@@ -203,12 +220,19 @@ fun HomeScreen(
                                 if (isRecording) onStopRecording() else onStartRecording()
                             }
                     ) {
-                        Icon(
-                            imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                            contentDescription = if (isRecording) "Stop recording" else "Start recording",
-                            tint = Color.White,
-                            modifier = Modifier.size(54.dp)
-                        )
+                        if (isProcessing) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(36.dp)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
+                                contentDescription = if (isRecording) "Stop recording" else "Start recording",
+                                tint = Color.White,
+                                modifier = Modifier.size(54.dp)
+                            )
+                        }
                     }
                 }
 
@@ -244,12 +268,101 @@ fun HomeScreen(
                         )
                     }
                 }
+
+                // UI Improvement: Cancel Recording & Manual Input Fallback
+                var showManualInputDialog by remember { mutableStateOf(false) }
+                var manualInputText by remember { mutableStateOf("") }
+
+                if (isRecording) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(onClick = onCancelRecording) {
+                        Text(
+                            text = "✕ Cancel Recording",
+                            color = Color(0xFFFF5252),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else if (!isProcessing) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(onClick = { showManualInputDialog = true }) {
+                        Text(
+                            text = "✍ Or Write a Reflection Manually",
+                            color = Color(0xFFC0B3FF),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                if (showManualInputDialog) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showManualInputDialog = false
+                            manualInputText = ""
+                        },
+                        title = {
+                            Text(
+                                text = "Write Down Your Thoughts",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        },
+                        text = {
+                            OutlinedTextField(
+                                value = manualInputText,
+                                onValueChange = { manualInputText = it },
+                                placeholder = { Text("How are you feeling today?", color = Color(0xFF8682A8)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(140.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    focusedBorderColor = Color(0xFF7A60FF),
+                                    unfocusedBorderColor = Color(0xFF2C2750),
+                                    focusedContainerColor = Color(0xFF141225),
+                                    unfocusedContainerColor = Color(0xFF141225)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    if (manualInputText.trim().isNotEmpty()) {
+                                        onSaveManualReflection(manualInputText.trim())
+                                        showManualInputDialog = false
+                                        manualInputText = ""
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A60FF)),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("Analyze & Save", color = Color.White)
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                showManualInputDialog = false
+                                manualInputText = ""
+                            }) {
+                                Text("Cancel", color = Color(0xFFB0AFC0))
+                            }
+                        },
+                        containerColor = Color(0xFF1C1A30),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                }
             }
 
             // Ad Banner Placeholder
-            com.localvoicejournal.mobile.util.AdsHelper.BannerAd(
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            if (!isPremium) {
+                com.localvoicejournal.mobile.util.AdsHelper.BannerAd(
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
 
             // Bottom Navigation Bar
             if (showBottomBar) {
@@ -264,7 +377,7 @@ fun HomeScreen(
                 ) {
                     TextButton(onClick = onNavigateToHistory) {
                         Text(
-                            text = "History",
+                            text = stringResource(R.string.history),
                             color = Color(0xFFC0B3FF),
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
@@ -280,7 +393,7 @@ fun HomeScreen(
 
                     TextButton(onClick = onNavigateToSettings) {
                         Text(
-                            text = "Settings",
+                            text = stringResource(R.string.settings),
                             color = Color(0xFF9693B8),
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp

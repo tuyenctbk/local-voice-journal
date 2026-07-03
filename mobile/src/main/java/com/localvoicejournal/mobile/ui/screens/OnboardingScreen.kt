@@ -13,37 +13,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.localvoicejournal.mobile.R
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
     onRequestPermission: () -> Unit,
     hasMicrophonePermission: Boolean,
     onFinishOnboarding: () -> Unit
 ) {
-    var currentStep by remember { mutableStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
     
     val steps = listOf(
         OnboardingStep(
-            title = "AuraJournal",
+            title = stringResource(R.string.app_name),
             subtitle = "Your voice reflection space",
-            description = "Welcome to a sensory-friendly, minimalist space where you can capture your daily thoughts by speaking for just 60 seconds."
+            description = stringResource(R.string.onboarding_welcome)
         ),
         OnboardingStep(
-            title = "100% Privacy-First",
+            title = stringResource(R.string.privacy_first),
             subtitle = "Local processing, zero servers",
             description = "Your intimate reflections, audio transcripts, and analysis never leave this phone. Processing runs completely offline using local models."
         ),
         OnboardingStep(
             title = "Microphone Access",
             subtitle = "Grant audio recording permission",
-            description = "We need audio access to transcribe your reflections locally. Click the button below to grant permission."
+            description = stringResource(R.string.mic_permission_required)
         )
+    )
+
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { steps.size }
     )
 
     // Deep sensory-friendly dark theme gradient (HSL derived)
@@ -79,61 +89,65 @@ fun OnboardingScreen(
                 modifier = Modifier.padding(top = 16.dp)
             )
 
-            // Dynamic Step Content
-            Column(
+            // Dynamic Step Content (Swipeable Pager)
+            HorizontalPager(
+                state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val step = steps[currentStep]
-                
-                Text(
-                    text = step.title,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 38.sp
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Text(
-                    text = step.subtitle,
-                    fontSize = 16.sp,
-                    color = Color(0xFFC0B3FF),
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Text(
-                    text = step.description,
-                    fontSize = 15.sp,
-                    color = Color(0xFFB0AFC0),
-                    textAlign = TextAlign.Center,
-                    lineHeight = 22.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                    .weight(1f)
+            ) { page ->
+                val step = steps[page]
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = step.title,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 38.sp
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = step.subtitle,
+                        fontSize = 16.sp,
+                        color = Color(0xFFC0B3FF),
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Text(
+                        text = step.description,
+                        fontSize = 15.sp,
+                        color = Color(0xFFB0AFC0),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
 
-                if (currentStep == 2) {
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Button(
-                        onClick = onRequestPermission,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (hasMicrophonePermission) Color(0xFF2E7D32) else Color(0xFF7A60FF)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = if (hasMicrophonePermission) "✓ Permission Granted" else "Grant Microphone Permission",
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 12.dp)
-                        )
+                    if (page == 2) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Button(
+                            onClick = onRequestPermission,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (hasMicrophonePermission) Color(0xFF2E7D32) else Color(0xFF7A60FF)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = if (hasMicrophonePermission) "✓ Permission Granted" else "Grant Microphone Permission",
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(vertical = 4.dp, horizontal = 12.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -152,9 +166,9 @@ fun OnboardingScreen(
                         Box(
                             modifier = Modifier
                                 .padding(horizontal = 4.dp)
-                                .size(width = if (index == currentStep) 24.dp else 8.dp, height = 8.dp)
+                                .size(width = if (index == pagerState.currentPage) 24.dp else 8.dp, height = 8.dp)
                                 .clip(RoundedCornerShape(4.dp))
-                                .background(if (index == currentStep) Color(0xFF7A60FF) else Color(0xFF423E5D))
+                                .background(if (index == pagerState.currentPage) Color(0xFF7A60FF) else Color(0xFF423E5D))
                         )
                     }
                 }
@@ -167,9 +181,13 @@ fun OnboardingScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (currentStep > 0) {
-                        TextButton(onClick = { currentStep-- }) {
-                            Text("Back", color = Color(0xFFB0AFC0))
+                    if (pagerState.currentPage > 0) {
+                        TextButton(onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        }) {
+                            Text(stringResource(R.string.back), color = Color(0xFFB0AFC0))
                         }
                     } else {
                         Spacer(modifier = Modifier.width(60.dp))
@@ -177,8 +195,10 @@ fun OnboardingScreen(
 
                     Button(
                         onClick = {
-                            if (currentStep < 2) {
-                                currentStep++
+                            if (pagerState.currentPage < 2) {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                }
                             } else {
                                 if (hasMicrophonePermission) {
                                     onFinishOnboarding()
@@ -191,10 +211,10 @@ fun OnboardingScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier
                             .height(56.dp)
-                            .width(140.dp)
+                            .width(160.dp)
                     ) {
                         Text(
-                            text = if (currentStep == 2) "Get Started" else "Next",
+                            text = if (pagerState.currentPage == 2) stringResource(R.string.get_started) else stringResource(R.string.next),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -212,6 +232,7 @@ data class OnboardingStep(
     val description: String
 )
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
 fun PreviewOnboardingScreen() {

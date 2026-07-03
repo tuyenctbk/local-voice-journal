@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">НАЖМИТЕ ДЛЯ ЗАПИСИ</string>
+    <string name="tap_to_record_max">Нажмите для записи (макс. 60 сек)</string>
+    <string name="history">История</string>
+    <string name="settings">Настройки</string>
+    <string name="premium">Премиум</string>
+    <string name="next">Далее</string>
+    <string name="back">Назад</string>
+    <string name="get_started">Начать</string>
+    <string name="onboarding_welcome">Добро пожаловать в минималистичное пространство, где вы можете записывать свои ежедневные мысли, просто разговаривая в течение 60 секунд.</string>
+    <string name="privacy_first">100% Конфиденциальность</string>
+    <string name="mic_permission_required">Разрешение на доступ к микрофону требуется для расшифровки ваших размышлений.</string>
+    <string name="stress_level">Уровень стресса</string>
+    <string name="low_calm">НИЗКИЙ (Спокойствие)</string>
+    <string name="medium">СРЕДНИЙ</string>
+    <string name="high_stress">ВЫСОКИЙ (Стресс)</string>
+</resources>

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class JournalCarScreen(carContext: CarContext) : Screen(carContext) {
 
@@ -90,8 +91,10 @@ class JournalCarScreen(carContext: CarContext) : Screen(carContext) {
             )
             db.journalDao().insertEntry(entry)
             
-            statusText = "Reflection saved successfully! (100% Offline)"
-            invalidate()
+            withContext(Dispatchers.Main) {
+                statusText = "Reflection saved successfully! (100% Offline)"
+                invalidate()
+            }
         }
     }
 }

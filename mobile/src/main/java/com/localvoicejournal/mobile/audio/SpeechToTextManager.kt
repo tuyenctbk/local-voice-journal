@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,6 +30,12 @@ class SpeechToTextManager(private val context: Context) {
     private val _isRecording = MutableStateFlow(false)
     val isRecording: StateFlow<Boolean> = _isRecording
 
+    private val _isProcessing = MutableStateFlow(false)
+    val isProcessing: StateFlow<Boolean> = _isProcessing
+
+    private val _onTranscriptReady = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val onTranscriptReady: SharedFlow<String> = _onTranscriptReady
+
     private val _soundLevel = MutableStateFlow(0f) // Normalized RMS dB, e.g. 0.0 to 1.0
     val soundLevel: StateFlow<Float> = _soundLevel
 
@@ -39,6 +47,7 @@ class SpeechToTextManager(private val context: Context) {
     fun startListening() {
         _transcript.value = ""
         _isRecording.value = true
+        _isProcessing.value = false
         _status.value = "Listening..."
 
         if (isRecognizerAvailable) {
@@ -69,6 +78,7 @@ class SpeechToTextManager(private val context: Context) {
     fun stopListening() {
         if (!_isRecording.value) return
         _isRecording.value = false
+        _isProcessing.value = true
         _status.value = "Processing local transcript..."
 
         if (isRecognizerAvailable && speechRecognizer != null) {
@@ -76,16 +86,40 @@ class SpeechToTextManager(private val context: Context) {
                 speechRecognizer?.stopListening()
             } catch (e: Exception) {
                 Log.e(tag, "Error stopping SpeechRecognizer: ${e.message}", e)
+                _isProcessing.value = false
             }
+        } else {
+            // For simulation
+            simulatedJob?.cancel()
+            simulatedJob = null
+            
+            if (_transcript.value.isEmpty()) {
+                _transcript.value = getFallbackTranscript()
+            }
+            _status.value = "Analysis complete"
+            _isProcessing.value = false
+            _onTranscriptReady.tryEmit(_transcript.value)
         }
+    }
+
+    fun cancelListening() {
+        if (!_isRecording.value) return
+        _isRecording.value = false
+        _isProcessing.value = false
+        _status.value = "Recording cancelled"
+        _transcript.value = ""
+        _soundLevel.value = 0f
         
-        simulatedJob?.cancel()
-        simulatedJob = null
-        
-        if (_transcript.value.isEmpty()) {
-            _transcript.value = getFallbackTranscript()
+        if (isRecognizerAvailable && speechRecognizer != null) {
+            try {
+                speechRecognizer?.cancel()
+            } catch (e: Exception) {
+                Log.e(tag, "Error cancelling SpeechRecognizer: ${e.message}", e)
+            }
+        } else {
+            simulatedJob?.cancel()
+            simulatedJob = null
         }
-        _status.value = "Analysis complete"
     }
 
     fun destroy() {
@@ -159,24 +193,32 @@ class SpeechToTextManager(private val context: Context) {
             }
             Log.w(tag, "SpeechRecognizer Error: $message ($error)")
             
+            _isRecording.value = false
             // Fallback to simulation/mock if no match or busy so user can still test the app
             if (error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
                 _status.value = "No voice heard, creating sample entry..."
-                _transcript.value = getFallbackTranscript()
-                _isRecording.value = false
+                val fallback = getFallbackTranscript()
+                _transcript.value = fallback
+                _isProcessing.value = false
+                _onTranscriptReady.tryEmit(fallback)
             } else {
                 _status.value = "$message. Try again."
-                _isRecording.value = false
+                _isProcessing.value = false
             }
         }
 
         override fun onResults(results: Bundle?) {
             val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            if (!matches.isNullOrEmpty()) {
-                _transcript.value = matches[0]
+            val finalTranscript = if (!matches.isNullOrEmpty()) {
+                matches[0]
+            } else {
+                _transcript.value.ifEmpty { getFallbackTranscript() }
             }
+            _transcript.value = finalTranscript
             _isRecording.value = false
+            _isProcessing.value = false
             _status.value = "Analysis complete"
+            _onTranscriptReady.tryEmit(finalTranscript)
         }
 
         override fun onPartialResults(partialResults: Bundle?) {

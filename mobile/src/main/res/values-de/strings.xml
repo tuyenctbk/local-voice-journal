@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">ZUM REFLEKTIEREN TIPPEN</string>
+    <string name="tap_to_record_max">Tippen zum Aufnehmen (max. 60 Sek.)</string>
+    <string name="history">Verlauf</string>
+    <string name="settings">Einstellungen</string>
+    <string name="premium">Premium</string>
+    <string name="next">Weiter</string>
+    <string name="back">Zurück</string>
+    <string name="get_started">Loslegen</string>
+    <string name="onboarding_welcome">Willkommen in einem reizarmen, minimalistischen Raum, in dem du deine täglichen Gedanken festhalten kannst, indem du nur 60 Sekunden lang sprichst.</string>
+    <string name="privacy_first">100 % Datenschutz</string>
+    <string name="mic_permission_required">Das Mikrofon wird benötigt, um die Aufnahmen zu transkribieren.</string>
+    <string name="stress_level">Stresslevel</string>
+    <string name="low_calm">NIEDRIG (Ruhig)</string>
+    <string name="medium">MITTEL</string>
+    <string name="high_stress">HOCH (Stress)</string>
+</resources>

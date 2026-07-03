@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="tap_to_reflect">탭하여 성찰하기</string>
+    <string name="tap_to_record_max">탭하여 녹음 (최대 60초)</string>
+    <string name="history">기록</string>
+    <string name="settings">설정</string>
+    <string name="premium">프리미엄</string>
+    <string name="next">다음</string>
+    <string name="back">뒤로</string>
+    <string name="get_started">시작하기</string>
+    <string name="onboarding_welcome">감각 친화적이고 미니멀한 공간에 오신 것을 환영합니다. 단 60초 동안 말하는 것만으로 매일의 생각을 기록할 수 있습니다.</string>
+    <string name="privacy_first">100% 프라이버시 우선</string>
+    <string name="mic_permission_required">녹음을 텍스트로 변환하려면 마이크 권한이 필요합니다.</string>
+    <string name="stress_level">스트레스 지수</string>
+    <string name="low_calm">낮음 (평온)</string>
+    <string name="medium">보통</string>
+    <string name="high_stress">높음 (스트레스)</string>
+</resources>

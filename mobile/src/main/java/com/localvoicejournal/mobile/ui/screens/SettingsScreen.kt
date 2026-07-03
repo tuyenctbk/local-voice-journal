@@ -32,6 +32,7 @@ fun SettingsScreen(
     isPremium: Boolean,
     onPremiumToggled: (Boolean) -> Unit,
     onClearAllData: () -> Unit,
+    onExportBackup: () -> Unit = {},
     onBack: () -> Unit,
     onRequestReview: () -> Unit,
     showBackButton: Boolean = true
@@ -151,10 +152,8 @@ fun SettingsScreen(
                 SettingsGroup(title = "Privacy & Database") {
                     SettingsItem(
                         title = "Export Local Backup (JSON)",
-                        subtitle = "Saves an encrypted copy of your journal text to your Downloads",
-                        onClick = {
-                            Toast.makeText(context, "Backup JSON generated in Local storage.", Toast.LENGTH_LONG).show()
-                        }
+                        subtitle = "Generates and exports a JSON copy of your journal reflections",
+                        onClick = onExportBackup
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))
@@ -209,7 +208,9 @@ fun SettingsScreen(
                     )
                 }
 
-                com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                if (!isPremium) {
+                    com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                }
             }
         }
     }

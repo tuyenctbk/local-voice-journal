@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -31,6 +32,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.tooling.preview.Preview
+
+import androidx.compose.ui.res.stringResource
+import com.localvoicejournal.mobile.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,9 +149,9 @@ fun DashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("LOW (Calm)", color = Color(0xFF00E676), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                                Text("MEDIUM", color = Color(0xFFFFB300), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                                Text("HIGH (Stress)", color = Color(0xFFFF5252), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.low_calm), color = Color(0xFF00E676), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.medium), color = Color(0xFFFFB300), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.high_stress), color = Color(0xFFFF5252), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
 
@@ -259,7 +263,7 @@ fun DashboardScreen(
                 }
 
                 // List of reflections
-                items(entries) { entry ->
+                itemsIndexed(entries) { index, entry ->
                     val dateStr = remember(entry.timestamp) {
                         val sdf = SimpleDateFormat("MMM d, yyyy - h:mm a", Locale.getDefault())
                         sdf.format(Date(entry.timestamp))
@@ -285,8 +289,8 @@ fun DashboardScreen(
                                     color = Color(0xFF8682A8),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold
-                                )
-
+                               )
+ 
                                 val stressColor = when (entry.stressLevel) {
                                     "HIGH" -> Color(0xFFFF5252)
                                     "MEDIUM" -> Color(0xFFFFB300)
@@ -330,10 +334,17 @@ fun DashboardScreen(
                             }
                         }
                     }
-                }
 
-                item {
-                    com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                    if (!isPremium && (index + 1) % 4 == 0) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        com.localvoicejournal.mobile.util.AdsHelper.NativeAd()
+                    }
+                }
+ 
+                if (!isPremium) {
+                    item {
+                        com.localvoicejournal.mobile.util.AdsHelper.BannerAd()
+                    }
                 }
             }
         }
