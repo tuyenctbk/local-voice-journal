@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 enum class AppScreen {
     ONBOARDING,
     HOME,
+    NEW_ENTRY,
     DETAIL,
     DASHBOARD,
     PREMIUM,
@@ -118,7 +119,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            fun saveReflection(transcript: String, durationSeconds: Int) {
+            fun saveReflection(transcript: String, durationSeconds: Int, title: String = "") {
                 lifecycleScope.launch {
                     val analysisResult = aiAnalyzer.analyze(transcript)
                     val newEntry = JournalEntry(
@@ -128,9 +129,13 @@ class MainActivity : ComponentActivity() {
                         themes = analysisResult.themes,
                         stressors = analysisResult.stressors,
                         habits = analysisResult.habits,
-                        durationSeconds = durationSeconds
+                        durationSeconds = durationSeconds,
+                        title = title
                     )
                     val id = database.journalDao().insertEntry(newEntry)
+                    
+                    // Show Interstitial ad before opening details
+                    com.localvoicejournal.mobile.util.AdsHelper.showInterstitial(this@MainActivity, isPremium)
                     
                     // Automatically open newly saved entry detail
                     database.journalDao().getEntryById(id).first()?.let { saved ->
@@ -268,9 +273,6 @@ class MainActivity : ComponentActivity() {
                                         onStopRecording = {
                                             sttManager.stopListening()
                                         },
-                                        onSaveManualReflection = { text ->
-                                            saveReflection(text, 0)
-                                        },
                                         onCancelRecording = {
                                             sttManager.cancelListening()
                                         },
@@ -283,7 +285,22 @@ class MainActivity : ComponentActivity() {
                                         onNavigateToPremium = {
                                             currentScreen = AppScreen.PREMIUM
                                         },
+                                        onNavigateToNewEntry = {
+                                            currentScreen = AppScreen.NEW_ENTRY
+                                        },
                                         showBottomBar = !useRail
+                                    )
+                                }
+                                
+                                AppScreen.NEW_ENTRY -> {
+                                    NewEntryScreen(
+                                        onSave = { title, note ->
+                                            saveReflection(note, 0, title)
+                                            currentScreen = AppScreen.HOME
+                                        },
+                                        onBack = {
+                                            currentScreen = AppScreen.HOME
+                                        }
                                     )
                                 }
 
@@ -315,6 +332,7 @@ class MainActivity : ComponentActivity() {
                                         isPremium = isPremium,
                                         onEntryClick = { entry ->
                                             selectedEntry = entry
+                                            com.localvoicejournal.mobile.util.AdsHelper.showInterstitial(this@MainActivity, isPremium)
                                             currentScreen = AppScreen.DETAIL
                                         },
                                         onBack = {
@@ -353,6 +371,9 @@ class MainActivity : ComponentActivity() {
                                         },
                                         onExportBackup = {
                                             exportBackup()
+                                        },
+                                        onPopulateDemoData = {
+                                            populateDemoData()
                                         },
                                         onBack = {
                                             currentScreen = AppScreen.HOME
@@ -469,6 +490,87 @@ class MainActivity : ComponentActivity() {
                 startActivity(android.content.Intent.createChooser(shareIntent, "Export Backup JSON"))
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun populateDemoData() {
+        lifecycleScope.launch {
+            try {
+                val now = System.currentTimeMillis()
+                val dayMs = 24 * 60 * 60 * 1000L
+                
+                val transcripts = listOf(
+                    "Had a really productive day at work. Handled a big client presentation, stress was moderate but manageable. Slept well and drank plenty of water.",
+                    "Struggled to sleep last night, woke up with a headache. A lot of back-to-back meetings at the office today. Felt quite overwhelmed and anxious.",
+                    "Spent the morning walking in the park. Felt very peaceful and relaxed. Read a book, had a good conversation with a friend.",
+                    "Had an argument with a coworker about project priorities. Felt frustrated and tense. Tried to meditate in the evening to wind down.",
+                    "Great workout at the gym today. Ran 5k and felt very energized. Ready for the weekend, feeling good overall.",
+                    "Busy weekend prep. Cleaned the whole apartment, did some meal prep. Sleep was okay, ready for the upcoming week.",
+                    "Woke up feeling refreshed. Had a nice breakfast and worked on my personal coding project. Felt highly focused and satisfied.",
+                    "Travel day. Busy airport terminal, flight was slightly delayed. Felt tired and a bit stressed by the crowd, but managed with music.",
+                    "Nice relaxing Sunday. Spent time with family, had a barbecue. Very low stress, good sleep, no work thoughts.",
+                    "Monday morning rush. Had to rush to catch the bus. Stress was initially high but subsided once I got to my desk. Feeling focused now."
+                )
+                
+                val stressLevels = listOf("LOW", "MEDIUM", "LOW", "HIGH", "LOW", "LOW", "LOW", "MEDIUM", "LOW", "MEDIUM")
+                
+                val themesList = listOf(
+                    listOf("Career", "Productivity"),
+                    listOf("Career", "Health"),
+                    listOf("Relationships", "Leisure"),
+                    listOf("Career", "Relationships"),
+                    listOf("Fitness", "Health"),
+                    listOf("Leisure", "Productivity"),
+                    listOf("Hobbies", "Productivity"),
+                    listOf("Travel", "Health"),
+                    listOf("Relationships", "Family"),
+                    listOf("Career", "Productivity")
+                )
+                
+                val stressorsList = listOf(
+                    listOf("Presentation"),
+                    listOf("Meetings", "Lack of sleep"),
+                    emptyList(),
+                    listOf("Conflict"),
+                    emptyList(),
+                    emptyList(),
+                    emptyList(),
+                    listOf("Crowds", "Delay"),
+                    emptyList(),
+                    listOf("Commute")
+                )
+                
+                val habitsList = listOf(
+                    listOf("Hydration", "Good Sleep"),
+                    listOf("Hydration"),
+                    listOf("Good Sleep"),
+                    emptyList(),
+                    listOf("Exercise", "Good Sleep"),
+                    listOf("Hydration"),
+                    listOf("Good Sleep"),
+                    emptyList(),
+                    listOf("Good Sleep"),
+                    listOf("Hydration")
+                )
+                
+                for (i in 0 until 10) {
+                    val entryTime = now - (9 - i) * dayMs
+                    val entry = JournalEntry(
+                        timestamp = entryTime,
+                        transcript = transcripts[i],
+                        stressLevel = stressLevels[i],
+                        themes = themesList[i],
+                        stressors = stressorsList[i],
+                        habits = habitsList[i],
+                        durationSeconds = 30 + (i * 3) % 30
+                    )
+                    database.journalDao().insertEntry(entry)
+                }
+                
+                Toast.makeText(this@MainActivity, "Demo data populated successfully!", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Failed to populate data: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

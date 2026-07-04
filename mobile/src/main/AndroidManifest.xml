@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
     <application
         android:name=".AuraJournalApp"
         android:allowBackup="true"
@@ -30,18 +32,26 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!-- Android Auto configuration -->
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
+        <service
+            android:name=".audio.ReflectionMediaService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="Instantiatable">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
 
+        <!-- Android Automotive Car App service declaration -->
         <service
             android:name=".car.JournalCarAppService"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />
-                <category android:name="androidx.car.app.category.POI" />
             </intent-filter>
+            <meta-data
+                android:name="android.car.application"
+                android:resource="@xml/automotive_app_desc" />
         </service>
 
         <activity
