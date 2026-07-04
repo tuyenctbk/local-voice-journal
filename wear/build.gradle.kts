@@ -14,7 +14,7 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 30 // Wear OS 3.0+
         targetSdk = 36
-        versionCode = 1023
+        versionCode = 1033
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

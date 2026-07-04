@@ -15,7 +15,7 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1021
+        versionCode = 1031
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

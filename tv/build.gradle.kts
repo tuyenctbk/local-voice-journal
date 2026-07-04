@@ -14,7 +14,7 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 24 // Android TV 7.0+ (Matches :core requirements)
         targetSdk = 37
-        versionCode = 1022
+        versionCode = 1032
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
