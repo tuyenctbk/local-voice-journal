@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="recording_reflection">성찰 녹음 중</string>
+    <string name="listening">듣는 중...</string>
+    <string name="recording_service_channel">녹음 서비스 채널</string>
+    <string name="reflecting">성찰 중...</string>
+    <string name="tap_to_record">탭하여 녹음</string>
+    <string name="syncing">휴대폰과 동기화 중...</string>
+    <string name="reflected">기록 완료!</string>
+    <string name="stop_reflection">성찰 중지</string>
+    <string name="start_reflection">성찰 시작</string>
+</resources>

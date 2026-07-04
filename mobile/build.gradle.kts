@@ -15,7 +15,7 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
+        versionCode = 1021
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -77,10 +77,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Adaptive
-    implementation("androidx.compose.material3:material3-window-size-class")
-    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
+    implementation(libs.compose.material3.windowsize)
+    implementation(libs.compose.adaptive)
+    implementation(libs.compose.adaptive.layout)
+    implementation(libs.compose.adaptive.navigation)
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -88,7 +88,6 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
-    implementation(libs.compose.material3.windowsize)
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.viewmodel.compose)
 
@@ -111,8 +110,7 @@ dependencies {
     // Room runtime & Compose icons
     implementation(libs.room.runtime)
     implementation("androidx.compose.material:material-icons-extended")
-
-    // Android Auto Car App
+    implementation(libs.androidx.media)
     implementation(libs.androidx.car.app)
 
     testImplementation(libs.junit)

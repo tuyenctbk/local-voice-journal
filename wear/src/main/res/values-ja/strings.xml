@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="recording_reflection">振り返りを録音中</string>
+    <string name="listening">聞き取り中...</string>
+    <string name="recording_service_channel">録音サービスチャネル</string>
+    <string name="reflecting">振り返り中...</string>
+    <string name="tap_to_record">タップして録音</string>
+    <string name="syncing">スマートフォンと同期中...</string>
+    <string name="reflected">記録しました！</string>
+    <string name="stop_reflection">振り返りを停止</string>
+    <string name="start_reflection">振り返りを開始</string>
+</resources>

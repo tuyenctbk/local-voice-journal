@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="recording_reflection">Grabando Reflexión</string>
+    <string name="listening">Escuchando...</string>
+    <string name="recording_service_channel">Canal del Servicio de Grabación</string>
+    <string name="reflecting">Reflexionando...</string>
+    <string name="tap_to_record">Toca para grabar</string>
+    <string name="syncing">Sincronizando con el teléfono...</string>
+    <string name="reflected">¡Reflejado!</string>
+    <string name="stop_reflection">Detener reflexión</string>
+    <string name="start_reflection">Iniciar reflexión</string>
+</resources>

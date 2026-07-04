@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AuraJournal</string>
+    <string name="recording_reflection">تسجيل التأمل</string>
+    <string name="listening">جاري الاستماع...</string>
+    <string name="recording_service_channel">قناة خدمة التسجيل</string>
+    <string name="reflecting">جاري التأمل...</string>
+    <string name="tap_to_record">انقر للتسجيل</string>
+    <string name="syncing">جاري المزامنة مع الهاتف...</string>
+    <string name="reflected">تم التأمل!</string>
+    <string name="stop_reflection">إيقاف التأمل</string>
+    <string name="start_reflection">بدء التأمل</string>
+</resources>
