@@ -64,6 +64,12 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name=".debug.DebugDbInsertReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.localvoicejournal.DEBUG_INSERT" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.localvoicejournal.app.fileprovider"

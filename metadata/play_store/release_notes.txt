@@ -1,0 +1,104 @@
+<en-US>
+- Optimized and improved AdMob ad formats across supported devices.
+- Upgraded to responsive Anchored Adaptive Banners and integrated native ads for phones and tablets.
+- Added preloaded interstitial ads during transition flows.
+- Optimizations and performance fixes for Android TV and Wear OS.
+</en-US>
+
+<ar-SA>
+- تحسين وتطوير أشكال إعلانات AdMob عبر الأجهزة المدعومة.
+- الترقية إلى إعلانات بانر تكيفية مدمجة وإعلانات أصلية مخصصة للهواتف والأجهزة اللوحية.
+- إضافة إعلانات بينية محملة مسبقًا أثناء انتقالات الشاشة.
+- تحسينات وإصلاحات الأداء لنظامي Android TV و Wear OS.
+</ar-SA>
+
+<de-DE>
+- Optimierte und verbesserte AdMob-Anzeigenformate auf unterstützten Geräten.
+- Upgrade auf adaptive Banner und integrierte native Anzeigen für Smartphones und Tablets.
+- Vorab geladene Interstitial-Anzeigen bei Bildschirmübergängen hinzugefügt.
+- Optimierungen und Leistungsverbesserungen für Android TV und Wear OS.
+</de-DE>
+
+<es-ES>
+- Formatos de anuncios de AdMob optimizados y mejorados en dispositivos compatibles.
+- Actualización a banners adaptativos e integración de anuncios nativos para teléfonos y tabletas.
+- Añadidos anuncios intersticiales precargados durante las transiciones de pantalla.
+- Optimizaciones y mejoras de rendimiento para Android TV y Wear OS.
+</es-ES>
+
+<fr-FR>
+- Formats d'annonces AdMob optimisés et améliorés sur les appareils pris en charge.
+- Passage aux bannières adaptatives et intégration d'annonces natives pour téléphones et tablettes.
+- Ajout d'annonces interstitielles préchargées lors des transitions d'écran.
+- Optimisations et corrections de performances pour Android TV et Wear OS.
+</fr-FR>
+
+<hi-IN>
+- समर्थित उपकरणों पर AdMob विज्ञापन प्रारूपों को अनुकूलित और बेहतर बनाया गया।
+- फोन और टैबलेट के लिए रिस्पॉन्सिव एंकर एडेप्टिव बैनर और नेटिव विज्ञापनों को एकीकृत किया गया।
+- स्क्रीन बदलाव के दौरान प्रीलोडेड इंटरस्टिशियल विज्ञापन जोड़े गए।
+- Android TV और Wear OS के लिए प्रदर्शन सुधार और अनुकूलन।
+</hi-IN>
+
+<id-ID>
+- Mengoptimalkan dan meningkatkan format iklan AdMob di seluruh perangkat yang didukung.
+- Peningkatan ke spanduk adaptif dan integrasi iklan asli untuk ponsel dan tablet.
+- Menambahkan iklan interstisial yang dimuat sebelumnya selama transisi layar.
+- Optimalisasi dan perbaikan performa untuk Android TV dan Wear OS.
+</id-ID>
+
+<it-IT>
+- Formati di annunci AdMob ottimizzati e migliorati sui dispositivi supportati.
+- Aggiornamento a banner adattivi e integrazione di annunci nativi per telefoni e tablet.
+- Aggiunti annunci interstitial precaricati durante le transizioni di schermo.
+- Ottimizzazioni e correzioni delle prestazioni per Android TV e Wear OS.
+</it-IT>
+
+<ja-JP>
+- サポートされているデバイスでのAdMob広告形式の最適化と改善。
+- スマートフォンおよびタブレット向けのレスポンシブなアンカーアダプティブバナーとネイティブ広告의 통합。
+- 画面遷移時のプリロードされたインタースティシャル広告の追加。
+- Android TVおよびWear OSの最適化とパフォーマンスの修正。
+</ja-JP>
+
+<ko-KR>
+- 지원되는 기기에서 AdMob 광고 형식을 최적화하고 개선했습니다.
+- 스마트폰 및 태블릿을 위한 반응형 앵커 적응형 배너 및 네이티브 광고 통합.
+- 화면 전환 중 미리 로드된 전면 광고 추가.
+- Android TV 및 Wear OS의 최적화 및 성능 수정.
+</ko-KR>
+
+<pt-BR>
+- Formatos de anúncios do AdMob otimizados e aprimorados em dispositivos compatíveis.
+- Atualização para banners adaptativos e integração de anúncios nativos para celulares e tablets.
+- Adicionados anúncios intersticiais pré-carregados durante as transições de tela.
+- Otimizações e correções de desempenho para Android TV e Wear OS.
+</pt-BR>
+
+<ru-RU>
+- Оптимизированы и улучшены форматы объявлений AdMob на поддерживаемых устройствах.
+- Переход на адаптивные баннеры и интеграция нативной рекламы для телефонов и планшетов.
+- Добавлены предварительно загруженные межстраничные объявления во время переходов между экранами.
+- Оптимизация и повышение производительности для Android TV и Wear OS.
+</ru-RU>
+
+<tr-TR>
+- Desteklenen cihazlarda AdMob reklam biçimleri optimize edildi ve geliştirildi.
+- Telefonlar ve tabletler için duyarlı uyarlanabilir banner'lar ve yerel reklam entegrasyonu.
+- Ekran geçişleri sırasında önceden yüklenmiş geçiş reklamları eklendi.
+- Android TV ve Wear OS için optimizasyonlar ve performans düzeltmeleri.
+</tr-TR>
+
+<vi-VN>
+- Tối ưu hóa và cải thiện các định dạng quảng cáo AdMob trên các thiết bị hỗ trợ.
+- Nâng cấp lên biểu ngữ thích ứng và tích hợp quảng cáo gốc cho điện thoại và máy tính bảng.
+- Thêm quảng cáo xen kẽ được tải trước trong các luồng chuyển tiếp màn hình.
+- Tối ưu hóa và sửa lỗi hiệu năng cho Android TV và Wear OS.
+</vi-VN>
+
+<zh-CN>
+- 优化并改进了受支持设备上的 AdMob 广告格式。
+- 升级了手机和平板电脑的自适应横幅广告并集成了原生广告。
+- 在屏幕切换过渡期间添加了预加载的插屏广告。
+- 针对 Android TV 和 Wear OS 的优化与性能修复。
+</zh-CN>

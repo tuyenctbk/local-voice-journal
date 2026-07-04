@@ -2,6 +2,7 @@ package com.localvoicejournal.wear.presentation
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Vibrator
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,8 @@ import androidx.wear.compose.material.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
+import com.localvoicejournal.wear.R
+import com.localvoicejournal.wear.service.RecordingService
 
 class WearMainActivity : ComponentActivity() {
 
@@ -64,9 +68,23 @@ class WearMainActivity : ComponentActivity() {
                         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
                         vibrator?.vibrate(60)
                     } catch (e: Exception) { }
+                },
+                onStartRecordingService = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    context.startForegroundService(intent)
+                },
+                onStopRecordingService = {
+                    val intent = Intent(context, RecordingService::class.java)
+                    context.stopService(intent)
                 }
             )
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val intent = Intent(this, RecordingService::class.java)
+        stopService(intent)
     }
 }
 
@@ -74,28 +92,40 @@ class WearMainActivity : ComponentActivity() {
 fun WearApp(
     hasPermission: Boolean,
     onRequestPermission: () -> Unit,
-    triggerVibration: () -> Unit
+    triggerVibration: () -> Unit,
+    onStartRecordingService: () -> Unit,
+    onStopRecordingService: () -> Unit
 ) {
+    val initialStatus = stringResource(R.string.tap_to_record)
     var isRecording by remember { mutableStateOf(false) }
-    var statusText by remember { mutableStateOf("Tap to record") }
+    var statusText by remember { mutableStateOf(initialStatus) }
     var countdown by remember { mutableStateOf(60) }
     val coroutineScope = rememberCoroutineScope()
 
+    val listeningText = stringResource(R.string.listening)
+    val syncingText = stringResource(R.string.syncing)
+    val reflectedText = stringResource(R.string.reflected)
+    val tapToRecordText = stringResource(R.string.tap_to_record)
+
     LaunchedEffect(isRecording) {
         if (isRecording) {
+            onStartRecordingService()
             countdown = 60
-            statusText = "Listening..."
+            statusText = listeningText
             while (countdown > 0 && isRecording) {
                 delay(1000)
                 countdown--
             }
             if (countdown == 0 && isRecording) {
                 isRecording = false
-                statusText = "Syncing with phone..."
+                onStopRecordingService()
+                statusText = syncingText
                 triggerVibration()
                 delay(2000)
-                statusText = "Reflected!"
+                statusText = reflectedText
             }
+        } else {
+            onStopRecordingService()
         }
     }
 
@@ -179,11 +209,11 @@ fun WearApp(
                                 if (isRecording) {
                                     isRecording = false
                                     coroutineScope.launch {
-                                        statusText = "Syncing..."
+                                        statusText = syncingText
                                         delay(1500)
-                                        statusText = "Reflected!"
+                                        statusText = reflectedText
                                         delay(2000)
-                                        statusText = "Tap to record"
+                                        statusText = tapToRecordText
                                     }
                                 } else {
                                     isRecording = true
@@ -193,7 +223,7 @@ fun WearApp(
                 ) {
                     Icon(
                         imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                        contentDescription = if (isRecording) "Stop reflection" else "Start reflection",
+                        contentDescription = if (isRecording) stringResource(R.string.stop_reflection) else stringResource(R.string.start_reflection),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -206,5 +236,11 @@ fun WearApp(
 @Preview(device = "id:wearos_large_round", showSystemUi = true)
 @Composable
 fun PreviewWearApp() {
-    WearApp(hasPermission = true, onRequestPermission = {}, triggerVibration = {})
+    WearApp(
+        hasPermission = true,
+        onRequestPermission = {},
+        triggerVibration = {},
+        onStartRecordingService = {},
+        onStopRecordingService = {}
+    )
 }

@@ -14,7 +14,7 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 24 // Android TV 7.0+ (Matches :core requirements)
         targetSdk = 37
-        versionCode = 1
+        versionCode = 1022
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -23,9 +23,19 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file("common_release_key.jks")
+            storePassword = "dpadhero123"
+            keyAlias = "dpad_hero_alias"
+            keyPassword = "dpadhero123"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

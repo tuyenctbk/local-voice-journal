@@ -43,15 +43,21 @@ fun HomeScreen(
     soundLevel: Float,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
-    onSaveManualReflection: (String) -> Unit = {},
     onCancelRecording: () -> Unit = {},
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToPremium: () -> Unit,
+    onNavigateToNewEntry: () -> Unit,
     showBottomBar: Boolean = true
 ) {
     val context = LocalContext.current
     var recordingSeconds by remember { mutableStateOf(60) }
+
+    var showAdAfterDelay by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(15000)
+        showAdAfterDelay = true
+    }
 
     // Haptic feedback trigger
     val triggerHaptic = {
@@ -269,10 +275,6 @@ fun HomeScreen(
                     }
                 }
 
-                // UI Improvement: Cancel Recording & Manual Input Fallback
-                var showManualInputDialog by remember { mutableStateOf(false) }
-                var manualInputText by remember { mutableStateOf("") }
-
                 if (isRecording) {
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(onClick = onCancelRecording) {
@@ -283,77 +285,6 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                } else if (!isProcessing) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextButton(onClick = { showManualInputDialog = true }) {
-                        Text(
-                            text = "✍ Or Write a Reflection Manually",
-                            color = Color(0xFFC0B3FF),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-
-                if (showManualInputDialog) {
-                    AlertDialog(
-                        onDismissRequest = {
-                            showManualInputDialog = false
-                            manualInputText = ""
-                        },
-                        title = {
-                            Text(
-                                text = "Write Down Your Thoughts",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                        },
-                        text = {
-                            OutlinedTextField(
-                                value = manualInputText,
-                                onValueChange = { manualInputText = it },
-                                placeholder = { Text("How are you feeling today?", color = Color(0xFF8682A8)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(140.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = Color.White,
-                                    unfocusedTextColor = Color.White,
-                                    focusedBorderColor = Color(0xFF7A60FF),
-                                    unfocusedBorderColor = Color(0xFF2C2750),
-                                    focusedContainerColor = Color(0xFF141225),
-                                    unfocusedContainerColor = Color(0xFF141225)
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    if (manualInputText.trim().isNotEmpty()) {
-                                        onSaveManualReflection(manualInputText.trim())
-                                        showManualInputDialog = false
-                                        manualInputText = ""
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A60FF)),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Analyze & Save", color = Color.White)
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = {
-                                showManualInputDialog = false
-                                manualInputText = ""
-                            }) {
-                                Text("Cancel", color = Color(0xFFB0AFC0))
-                            }
-                        },
-                        containerColor = Color(0xFF1C1A30),
-                        shape = RoundedCornerShape(16.dp)
-                    )
                 }
             }
 
@@ -378,6 +309,22 @@ fun HomeScreen(
                     TextButton(onClick = onNavigateToHistory) {
                         Text(
                             text = stringResource(R.string.history),
+                            color = Color(0xFFC0B3FF),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF4C4670))
+                    )
+
+                    TextButton(onClick = onNavigateToNewEntry) {
+                        Text(
+                            text = "New Entry",
                             color = Color(0xFFC0B3FF),
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
@@ -417,6 +364,7 @@ fun PreviewHomeScreen() {
         onStopRecording = {},
         onNavigateToHistory = {},
         onNavigateToSettings = {},
-        onNavigateToPremium = {}
+        onNavigateToPremium = {},
+        onNavigateToNewEntry = {}
     )
 }

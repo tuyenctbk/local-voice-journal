@@ -1,0 +1,388 @@
+=== English (United States) - en-US ===
+
+Title:
+AuraJournal
+
+Short Description:
+Privacy-first local voice reflection journal & emotional insight tracker.
+
+Full Description:
+AuraJournal is a sensory-friendly, minimalist voice reflection space built to preserve your total privacy. Reflect on your day, track your habits, and gain emotional insights with a single tap—completely offline.
+
+By combining local speech-to-text transcription with on-device natural language heuristics, AuraJournal ensures your most personal reflections never leave your phone. No logins, no cloud servers, and no data tracking.
+
+KEY FEATURES:
+1. One-Tap Voice Logging: Record up to 60-second voice reflection sessions with sensory-friendly visual feedback.
+2. Offline Speech-to-Text: Real-time local transcription utilizing Android's system-level speech recognition without uploading audio bytes to external servers.
+3. On-Device AI Insights: Instantly extracts core themes (Career, Relationships, Fitness, sleep), stress levels (Low, Medium, High), and habit metrics locally.
+4. Weekly Trends Dashboard: Beautiful, glowing Compose Canvas trendlines and habit tracking charts (Premium).
+5. Local JSON Portability: Export and import secure JSON backup files directly on-device using the Android Share Sheet.
+6. Wear OS Companion: Capture voice entries on your watch that sync directly to your companion phone.
+7. Android Auto Support: Reflect safely during your daily commute.
+
+PRIVACY-FIRST DESIGN:
+AuraJournal operates 100% offline. The database rests locally in Room SQLite, and we utilize no central data logging servers. Your voice is yours alone.
+
+
+=== Arabic (Saudi Arabia) - ar-SA ===
+
+Title:
+AuraJournal
+
+Short Description:
+دفتر مذكرات صوتي محلي خاص ومستشعر لدرجة التوتر بدون إنترنت.
+
+Full Description:
+AuraJournal هو مساحة تعبير صوتي بسيطة ومريحة للحواس مصممة خصيصاً للحفاظ على خصوصيتك الكاملة. تأمل في يومك، وتتبع عاداتك، واحصل على رؤى عاطفية بنقرة واحدة — دون اتصال بالإنترنت تمامًا.
+
+من خلال دمج ميزة تحويل الكلام إلى نص محليًا مع الاستدلالات اللغوية الطبيعية على الجهاز، يضمن لك AuraJournal عدم مغادرة تأملاتك الأكثر خصوصية لهاتفك أبدًا. لا تسجيل دخول، ولا خوادم سحابية، ولا تتبع للبيانات.
+
+الميزات الرئيسية:
+1. تسجيل صوتي بنقرة واحدة: سجل جلسات تأمل صوتي تصل إلى 60 ثانية مع تعليقات مرئية مريحة للحواس.
+2. تحويل الكلام إلى نص دون اتصال: تحويل محلي في الوقت الفعلي باستخدام التعرف على الصوت على مستوى النظام في أندرويد دون تحميل الملفات الصوتية إلى خوادم خارجية.
+3. رؤى الذكاء الاصطناعي على الجهاز: استخراج موضوعات رئيسية فورًا (العمل، العلاقات، اللياقة البدنية، النوم)، ومستويات التوتر (منخفض، متوسط، مرتفع)، ومقاييس العادات محليًا.
+4. لوحة مؤشرات أسبوعية: رسوم بيانية ومخططات تتبع عادات جميلة ومتوهجة مرسومة باستخدام Compose Canvas (مميز).
+5. نقل ملفات JSON محليًا: تصدير واستيراد ملفات نسخ احتياطي آمنة بصيغة JSON مباشرة على الجهاز باستخدام نافذة المشاركة في أندرويد.
+6. تطبيق Wear OS المصاحب: سجل مدخلات صوتية على ساعتك وتزامن مباشرة مع هاتفك المصاحب.
+7. دعم Android Auto: تأمل بأمان أثناء تنقلك اليومي.
+
+تصميم يركز على الخصوصية أولاً:
+يعمل AuraJournal دون اتصال بالإنترنت بنسبة 100%. تستقر قاعدة البيانات محليًا في Room SQLite، ولا نستخدم خوادم تسجيل بيانات مركزية. صوتك ملك لك وحدك.
+
+
+=== German (Germany) - de-DE ===
+
+Title:
+AuraJournal
+
+Short Description:
+Privates lokales Sprach-Tagebuch & emotionaler Stress-Tracker ohne Internet.
+
+Full Description:
+AuraJournal ist ein minimalistisches Sprach-Tagebuch, das entwickelt wurde, um Ihre Privatsphäre zu schützen. Reflektieren Sie Ihren Tag, verfolgen Sie Ihre Gewohnheiten und gewinnen Sie emotionale Erkenntnisse mit nur einem Fingertipp – komplett offline.
+
+Durch die Kombination lokaler Sprache-zu-Text-Transkription mit natürlicher Sprachanalyse direkt auf dem Gerät stellt AuraJournal sicher, dass Ihre persönlichsten Reflexionen niemals Ihr Telefon verlassen. Keine Logins, keine Cloud-Server und kein Datentracking.
+
+HAUPTMERKMALE:
+1. Sprachaufzeichnung mit einem Tipp: Nehmen Sie bis zu 60-sekündige Sprachreflexionssitzungen auf.
+2. Offline-Sprache-zu-Text: Lokale Transkription in Echtzeit unter Verwendung der Android-System-Spracherkennung, ohne Audiodateien auf externe Server hochzuladen.
+3. KI-Erkenntnisse auf dem Gerät: Extrahiert Kern-Themen (Beruf, Beziehungen, Fitness, Schlaf), Stressniveaus (Niedrig, Mittel, Hoch) und Gewohnheitsmetriken lokal auf dem Gerät.
+4. Wöchentliches Dashboard: Wunderschöne, leuchtende Grafiken und Diagramme zur Gewohnheitsverfolgung (Premium).
+5. Lokaler JSON-Export: Exportieren und importieren Sie sichere JSON-Backups direkt auf Ihrem Gerät.
+6. Wear OS Begleit-App: Nehmen Sie Spracheinträge auf Ihrer Uhr auf, die sich direkt mit Ihrem Telefon synchronisieren.
+7. Android Auto Unterstützung: Reflektieren Sie sicher während Ihrer täglichen Fahrt zur Arbeit.
+
+PRIVATSPHÄRE AN ERSTER STELLE:
+AuraJournal läuft zu 100% offline. Die Datenbank verbleibt lokal in einer Room SQLite-Datenbank. Ihre Stimme gehört Ihnen allein.
+
+
+=== Spanish (Spain) - es-ES ===
+
+Title:
+AuraJournal
+
+Short Description:
+Diario de voz local privado y rastreador de niveles de estrés sin conexión.
+
+Full Description:
+AuraJournal es un espacio de reflexión de voz minimalista y amigable, creado para preservar tu total privacidad. Reflexiona sobre tu día, realiza un seguimiento de tus hábitos y obtén información emocional con un solo toque, completamente fuera de línea.
+
+Al combinar la transcripción local de voz a texto con el procesamiento de lenguaje natural en el dispositivo, AuraJournal garantiza que tus reflexiones más personales nunca salgan de tu teléfono. Sin inicios de sesión, sin servidores en la nube y sin seguimiento de datos.
+
+CARACTERÍSTICAS PRINCIPALES:
+1. Registro de voz con un toque: Graba sesiones de reflexión de voz de hasta 60 segundos con comentarios visuales diseñados con gran estética.
+2. Voz a texto fuera de línea: Transcripción local en tiempo real utilizando el reconocimiento de voz del sistema Android, sin subir datos de audio a servidores externos.
+3. Análisis de IA local: Extrae instantáneamente temas clave (Trabajo, Relaciones, Fitness, Sueño), niveles de estrés (Bajo, Medio, Alto) y métricas de hábitos localmente.
+4. Tablero de tendencias semanales: Hermosos gráficos de tendencias y de hábitos en Compose Canvas (Premium).
+5. Portabilidad local de JSON: Exporta e importa copias de seguridad seguras en formato JSON utilizando el menú para compartir de Android.
+6. Compañero para Wear OS: Captura entradas de voz en tu reloj que se sincronizan directamente con tu teléfono.
+7. Soporte para Android Auto: Reflexiona de forma segura durante tu viaje diario.
+
+DISEÑO CON PRIVACIDAD PRIORITARIA:
+AuraJournal funciona 100% sin conexión. La base de datos reside localmente en Room SQLite y no utilizamos servidores centrales. Tu voz es tuya.
+
+
+=== French (France) - fr-FR ===
+
+Title:
+AuraJournal
+
+Short Description:
+Journal vocal local privé & suivi émotionnel du stress hors ligne.
+
+Full Description:
+AuraJournal est un espace de réflexion vocale minimaliste conçu pour préserver votre vie privée. Réfléchissez sur votre journée, suivez vos habitudes et obtenez des analyses émotionnelles en un seul geste — entièrement hors ligne.
+
+En combinant la transcription locale de la parole en texte avec une analyse de langage naturel sur l'appareil, AuraJournal garantit que vos réflexions les plus intimes ne quittent jamais votre téléphone. Pas d'inscription, pas de serveurs cloud et pas de suivi de données.
+
+CARACTÉRISTIQUES PRINCIPALES :
+1. Enregistrement vocal en un clic : Enregistrez des réflexions vocales jusqu'à 60 secondes avec des retours visuels soignés.
+2. Reconnaissance vocale hors ligne : Transcription locale en temps réel utilisant le système de reconnaissance vocale Android, sans transfert d'audio sur des serveurs externes.
+3. Analyses IA sur l'appareil : Extrait instantanément les thèmes clés (Travail, Relations, Forme, Sommeil), les niveaux de stress (Faible, Moyen, Élevé) et les habitudes localement.
+4. Tableau de bord hebdomadaire : Superbes graphiques de tendances et de suivi des habitudes créés avec Compose Canvas (Premium).
+5. Export local JSON : Exportez et importez des fichiers de sauvegarde JSON sécurisés directement sur l'appareil.
+6. Compagnon Wear OS : Enregistrez des entrées vocales depuis votre montre, synchronisées directement sur votre téléphone.
+7. Compatibilité Android Auto : Réfléchissez en toute sécurité pendant vos trajets quotidiens.
+
+RESPECT DE LA VIE PRIVÉE :
+AuraJournal fonctionne 100% hors ligne. La base de données reste locale avec Room SQLite. Votre voix n'appartient qu'à vous.
+
+
+=== Hindi (India) - hi-IN ===
+
+Title:
+AuraJournal
+
+Short Description:
+गोपनीयता-प्रथम स्थानीय आवाज डायरी और ऑफ़लाइन भावनात्मक तनाव ट्रैकर।
+
+Full Description:
+AuraJournal एक न्यूनतम और सहज आवाज डायरी है जिसे आपकी पूर्ण गोपनीयता की रक्षा के लिए बनाया गया है। अपने दिन पर विचार करें, अपनी आदतों को ट्रैक करें, और एक टैप में भावनात्मक अंतर्दृष्टि प्राप्त करें—पूरी तरह से ऑफ़लाइन।
+
+ऑन-डिवाइस नेचुरल लैंग्वेज प्रोसेसिंग के साथ स्थानीय स्पीच-टू-टेक्स्ट ट्रांसक्रिप्शन को मिलाकर, AuraJournal यह सुनिश्चित करता है कि आपके सबसे व्यक्तिगत विचार कभी भी आपके फोन से बाहर न जाएं। कोई लॉगिन नहीं, कोई क्लाउड सर्वर नहीं, और कोई डेटा ट्रैकिंग नहीं।
+
+मुख्य विशेषताएं:
+1. वन-टैप वॉयस लॉगिंग: विजुअल फीडबैक के साथ 60 सेकंड तक के वॉयस रिफ्लेक्शन सेशन रिकॉर्ड करें।
+2. ऑफ़लाइन स्पीच-टू-टेक्स्ट: एंड्रॉइड के सिस्टम-लेवल स्पीच रिकग्निशन का उपयोग करके वास्तविक समय में स्थानीय ट्रांसक्रिप्शन, बिना किसी बाहरी सर्वर पर ऑडियो डेटा अपलोड किए।
+3. ऑन-डिवाइस एआई अंतर्दृष्टि: स्थानीय रूप से मुख्य विषयों (करियर, रिश्ते, फिटनेस, नींद), तनाव के स्तर (कम, मध्यम, उच्च), और आदत मेट्रिक्स को तुरंत निकालता है।
+4. साप्ताहिक रुझान डैशबोर्ड: Compose Canvas का उपयोग करके बने सुंदर रुझान और आदत ट्रैकिंग चार्ट (प्रीमियम)।
+5. स्थानीय JSON पोर्टेबिलिटी: एंड्रॉइड शेयर शीट का उपयोग करके सीधे डिवाइस पर सुरक्षित JSON बैकअप फ़ाइलें निर्यात और आयात करें।
+6. Wear OS साथी: अपनी घड़ी पर आवाज प्रविष्टियां रिकॉर्ड करें जो सीधे आपके साथी फोन पर सिंक हो जाती हैं।
+7. Android Auto समर्थन: अपनी दैनिक यात्रा के दौरान सुरक्षित रूप से विचार रिकॉर्ड करें।
+
+गोपनीयता-प्रथम डिज़ाइन:
+AuraJournal 100% ऑफ़लाइन काम करता है। डेटाबेस स्थानीय रूप से Room SQLite में रहता है, और हम किसी भी केंद्रीय डेटा लॉगिंग सर्वर का उपयोग नहीं करते हैं। आपकी आवाज केवल आपकी है।
+
+
+=== Indonesian (Indonesia) - id-ID ===
+
+Title:
+AuraJournal
+
+Short Description:
+Jurnal suara lokal pribadi & pelacak stres emosional offline.
+
+Full Description:
+AuraJournal adalah ruang refleksi suara minimalis yang dibuat untuk menjaga privasi total Anda. Renungkan hari Anda, lacak kebiasaan Anda, dan dapatkan wawasan emosional dengan satu ketukan—sepenuhnya offline.
+
+Dengan menggabungkan transkripsi ucapan-ke-teks lokal dengan pemrosesan bahasa alami di perangkat, AuraJournal memastikan refleksi paling pribadi Anda tidak pernah meninggalkan ponsel Anda. Tanpa login, tanpa server cloud, dan tanpa pelakakan data.
+
+FITUR UTAMA:
+1. Perekaman Suara Sekali Ketuk: Rekam sesi refleksi suara hingga 60 detik dengan umpan balik visual yang ramah sensorik.
+2. Ucapan-ke-Teks Offline: Transkripsi lokal waktu nyata menggunakan pengenalan ucapan tingkat sistem Android tanpa mengunggah file audio ke server eksternal.
+3. Wawasan AI di Perangkat: Mengekstrak tema utama (Karir, Hubungan, Kebugaran, Tidur), tingkat stres (Rendah, Sedang, Tinggi), dan metrik kebiasaan secara lokal.
+4. Dasbor Tren Mingguan: Grafik tren dan bagan pelacakan kebiasaan yang indah dengan Compose Canvas (Premium).
+5. Portabilitas JSON Lokal: Ekspor dan impor file cadangan JSON yang aman langsung di perangkat menggunakan Android Share Sheet.
+6. Pendamping Wear OS: Ambil entri suara di jam tangan Anda yang disinkronkan langsung ke ponsel pendamping Anda.
+7. Dukungan Android Auto: Renungkan dengan aman selama perjalanan harian Anda.
+
+DESAIN UTAMAKAN PRIVASI:
+AuraJournal beroperasi 100% offline. Database disimpan secara lokal di Room SQLite, dan kami tidak menggunakan server pusat pelacakan data. Suara Anda adalah milik Anda sendiri.
+
+
+=== Italian (Italy) - it-IT ===
+
+Title:
+AuraJournal
+
+Short Description:
+Diario vocale locale privato & tracker dello stress emotivo offline.
+
+Full Description:
+AuraJournal è uno spazio di riflessione vocale minimalista progettato per preservare la tua totale privacy. Rifletti sulla tua giornata, monitora le tue abitudini e ottieni approfondimenti emotivi con un solo tocco, completamente offline.
+
+Combinando la trascrizione vocale locale sul dispositivo con analisi del linguaggio naturale offline, AuraJournal garantisce che le tue riflessioni più personali non lascino mai il tuo telefono. Nessun login, nessun server cloud e nessun tracciamento dei dati.
+
+CARATTERISTICHE PRINCIPALI:
+1. Registrazione vocale con un tocco: Registra riflessioni vocali fino a 60 secondi con feedback visivi curati.
+2. Riconoscimento vocale offline: Trascrizione locale in tempo reale tramite il sistema di riconoscimento vocale di Android, senza caricare audio su server esterni.
+3. Analisi IA sul dispositivo: Estrae temi chiave (Lavoro, Relazioni, Fitness, Sonno), livelli di stress (Basso, Medio, Alto) e abitudini a livello locale.
+4. Dashboard settimanale: Splendidi grafici delle tendenze e monitoraggio delle abitudini realizzati in Compose Canvas (Premium).
+5. Esportazione JSON locale: Esporta e importa backup JSON sicuri direttamente sul dispositivo.
+6. Assistente Wear OS: Registra note vocali dal tuo orologio sincronizzandole direttamente sul telefono.
+7. Supporto Android Auto: Rifletti in sicurezza durante il tragitto giornaliero.
+
+PRIVACY AL PRIMO POSTO:
+AuraJournal funziona al 100% offline. Il database risiede localmente in Room SQLite. La tua voce è solo tua.
+
+
+=== Japanese (Japan) - ja-JP ===
+
+Title:
+AuraJournal
+
+Short Description:
+完全オフラインのプライバシー重視音声日記＆ストレス分析トラッカー。
+
+Full Description:
+AuraJournalは、完全なプライバシーを保護するために構築された、感覚に優しくミニマルな音声リフレクションダイアリーです。タップ1回で、今日の出来事を振り返り、習慣を追跡し、感情の分析情報を取得できます。すべて完全オフラインで動作します。
+
+ローカルの音声テキスト変換技術とデバイス上の自然言語処理（NLP）を組み合わせることで、AuraJournalはあなたの最も個人的な振り返りデータがスマートフォンから送信されないことを保証します。ログイン不要、クラウドサーバー不要、データ追跡もありません。
+
+主な機能：
+1. ワンタップ音声ログ：感覚に優しいビジュアルフィードバックとともに、最大60秒の振り返り音声を記録できます。
+2. オフライン音声テキスト変換：外部サーバーに音声データをアップロードすることなく、Android의 システムレベルの音声認識を利用したリアルタイムのローカル文字起こし。
+3. デバイス上AI分析：主要なテーマ（キャリア、人間関係、フィットネス、睡眠）、ストレスレベル（低、中、高）、習慣メトリクスをデバイス上で即座に抽出します。
+4. 週間トレンドダッシュボード：Compose Canvasで描画された、美しく輝くストレス傾向グラフと習慣トラッカー（プレミアム）。
+5. ローカルJSONポータビリティ：Androidのシェアシートを使用して、安全なJSONバックアップファイルをデバイス上で直接エクスポートおよびインポート。
+6. Wear OS連携：スマートウォッチで音声入力を記録し、スマートフォンと直接同期します。
+7. Android Autoサポート：毎日の通勤中も安全に音声を記録して振り返ることができます。
+
+プライバシー第一のデザイン：
+AuraJournalは100%オフラインで動作します。データベースはRoom SQLiteを使用してデバイス内にローカル保存され、中央データログサーバーは一切使用しません。あなたの声はあなただけのものです。
+
+
+=== Korean (South Korea) - ko-KR ===
+
+Title:
+AuraJournal
+
+Short Description:
+개인정보를 보호하는 오프라인 음성 일기 및 스트레스 트래커.
+
+Full Description:
+AuraJournal은 사용자의 완벽한 프라이버시를 보호하기 위해 구축된 미니멀한 음성 성찰 다이어리입니다. 완전히 오프라인 상태에서 탭 한 번으로 하루를 성찰하고, 습관을 기록하고, 감정 분석을 얻을 수 있습니다.
+
+기기 내 로컬 음성-텍스트 변환(STT)과 자연어 처리 분석 기술을 결합하여 AuraJournal은 개인적인 성찰 내용이 휴대폰 외부로 유출되지 않도록 보장합니다. 로그인 없음, 클라우드 서버 없음, 데이터 추적이 전혀 없습니다.
+
+주요 특징:
+1. 원탭 음성 기록: 시각적 피드백과 함께 최대 60초 동안 음성 성찰 세션을 기록합니다.
+2. 오프라인 음성-텍스트 변환: 외부 서버에 오디오 바이트를 업로드하지 않고 Android 시스템 수준의 음성 인식을 활용한 실시간 로컬 전사.
+3. 기기 내 AI 분석: 주요 테마(커리어, 인간관계, 피트니스, 수면), 스트레스 수준(낮음, 보통, 높음), 습관 지표를 로컬에서 즉시 추출합니다.
+4. 주간 트렌드 대시보드: Compose Canvas로 구현한 아름다운 감정 추이 그래프 및 습관 트래킹 차트(프리미엄).
+5. 로컬 JSON 포터비리티: Android 공유 시트를 사용하여 안전한 JSON 백업 파일을 기기에서 직접 내보내고 가져옵니다.
+6. Wear OS 컴패니언: 스마트워치에서 음성 입력을 기록하여 컴패니언 폰으로 직접 동기화합니다.
+7. Android Auto 지원: 매일 출퇴근할 때도 안전하게 생각을 성찰하여 기록할 수 있습니다.
+
+개인정보 보호 최우선 디자인:
+AuraJournal은 100% 오프라인으로 작동합니다. 데이터베이스는 Room SQLite를 통해 로컬에 상주하며 중앙 서버를 사용하지 않습니다. 당신의 목소리는 오직 당신만의 것입니다.
+
+
+=== Portuguese (Brazil) - pt-BR ===
+
+Title:
+AuraJournal
+
+Short Description:
+Diário de voz local privado e rastreador de estresse emocional offline.
+
+Full Description:
+AuraJournal é um espaço de reflexão de voz minimalista e amigável, construído para preservar sua total privacidade. Reflita sobre o seu dia, acompanhe seus hábitos e obtenha insights emocionais com um único toque — completamente offline.
+
+Ao combinar a transcrição local de fala para texto com análise de linguagem natural no dispositivo, o AuraJournal garante que suas reflexões mais pessoais nunca saiam do seu telefone. Sem logins, sem servidores em nuvem e sem rastreamento de dados.
+
+PRINCIPAIS RECURSOS:
+1. Registro de voz com um toque: Grave sessões de reflexão de voz de até 60 segundos com feedback visual dinâmico.
+2. Fala para texto offline: Transcrição local em tempo real utilizando o reconhecimento de fala do sistema Android, sem upload de áudio para servidores externos.
+3. Análise de IA local: Extrai instantaneamente temas principais (Carreira, Relacionamentos, Fitness, Sono), níveis de estresse (Baixo, Médio, Alto) e métricas de hábitos localmente.
+4. Dashboard semanal: Lindos gráficos de tendências e rastreamento de hábitos no Compose Canvas (Premium).
+5. Portabilidade JSON local: Exporte e importe arquivos de backup JSON seguros diretamente no dispositivo.
+6. Companheiro Wear OS: Capture entradas de voz em seu relógio que são sincronizadas diretamente com seu telefone.
+7. Suporte ao Android Auto: Reflita com segurança durante seu trajeto diário.
+
+DESIGN COM PRIVACIDADE PRIORITÁRIA:
+O AuraJournal opera 100% offline. O banco de dados reside localmente no Room SQLite e não utilizamos servidores de registro de dados. Sua voz é sua.
+
+
+=== Russian (Russia) - ru-RU ===
+
+Title:
+AuraJournal
+
+Short Description:
+Локальный голосовой дневник и трекер уровня стресса без интернета.
+
+Full Description:
+AuraJournal — это минималистичный и удобный голосовой дневник, созданный для защиты вашей конфиденциальности. Анализируйте прошедший день, отслеживайте привычки и получайте эмоциональные выводы в одно касание — полностью оффлайн.
+
+Благодаря сочетанию локального преобразования речи в текст и обработки естественного языка непосредственно на устройстве, AuraJournal гарантирует, что ваши самые личные мысли никогда не покинут ваш телефон. Никаких профилей, облачных серверов и отслеживания данных.
+
+КЛЮЧЕВЫЕ ФУНКЦИИ:
+1. Запись голоса в одно касание: Записывайте голосовые размышления продолжительностью до 60 секунд с приятным визуальным оформлением.
+2. Оффлайн преобразование речи в текст: Локальная расшифровка в реальном времени с использованием системного распознавания речи Android без отправки аудио на внешние серверы.
+3. Локальный ИИ-анализ: Мгновенное извлечение ключевых тем (Карьера, Отношения, Фитнес, Сон), уровня стресса (Низкий, Средний, Высокий) и метрик привычек на устройстве.
+4. Еженедельная статистика: Красивые графики тенденций стресса и отслеживания привычек на Compose Canvas (Premium).
+5. Локальный экспорт JSON: Экспорт и импорт защищенных резервных копий JSON непосредственно на устройстве.
+6. Приложение для Wear OS: Записывайте голосовые заметки на часах с прямой синхронизацией на телефон.
+7. Поддержка Android Auto: Делайте записи безопасно во время ежедневных поездок.
+
+КОНФИДЕНЦИАЛЬНОСТЬ НА ПЕРВОМ МЕСТЕ:
+AuraJournal работает на 100% оффлайн. База данных хранится локально в Room SQLite. Ваш голос принадлежит только вам.
+
+
+=== Turkish (Turkey) - tr-TR ===
+
+Title:
+AuraJournal
+
+Short Description:
+Gizlilik odaklı çevrimdışı sesli günlük ve stres analiz takipçisi.
+
+Full Description:
+AuraJournal, tam gizliliğinizi korumak için tasarlanmış, duyusal dostu ve minimalist bir sesli günlük alanıdır. Tek bir dokunuşla gününüzü değerlendirin, alışkanlıklarınızı takip edin ve duygusal analizler elde edin—tamamen çevrimdışı.
+
+Cihaz içi yerel ses yazıya dökme teknolojisi ile doğal dil işleme analizini birleştiren AuraJournal, en kişisel düşüncelerinizin asla telefonunuzdan çıkmamasını sağlar. Giriş yapma yok, bulut sunucuları yok ve veri takibi yok.
+
+ANA ÖZELLİKLER:
+1. Tek Dokunuşla Ses Kaydı: Duyusal dostu görsel geri bildirim eşliğinde 60 saniyeye kadar sesli günlük oturumları kaydedin.
+2. Çevrimdışı Ses Yazıya Dökme: Android'in sistem düzeyinde ses tanıma özelliğini kullanarak, ses dosyalarını dış sunuculara yüklemeden gerçek zamanlı yerel transkripsiyon.
+3. Cihaz İçi Yapay Zeka Analizi: Ana temaları (Kariyer, İlişkiler, Fitness, Uyku), stres seviyelerini (Düşük, Orta, Yüksek) ve alışkanlık metriklerini yerel olarak anında analiz eder.
+4. Haftalık Grafik Paneli: Compose Canvas ile çizilmiş, stres eğilimlerini ve alışkanlık takiplerini gösteren grafikler (Premium).
+5. Yerel JSON Taşınabilirliği: Android Paylaşım Menüsü'nü kullanarak güvenli JSON yedekleme dosyalarını doğrudan cihaz üzerinde dışa aktarın ve içe aktarın.
+6. Wear OS Yardımcı Uygulaması: Akıllı saatinizde sesli kayıtlar yapın ve bunları doğrudan telefonunuzla senkronize edin.
+7. Android Auto Desteği: Günlük işe gidiş gelişleriniz sırasında güvenli bir şekilde sesli günlük tutun.
+
+ÖNCE GİZLİLİK TASARIMI:
+AuraJournal %100 çevrimdışı çalışır. Veritabanı Room SQLite ile yerel olarak cihazınızda saklanır ve merkezi bir sunucu kullanılmaz. Sesiniz yalnızca size aittir.
+
+
+=== Vietnamese (Vietnam) - vi-VN ===
+
+Title:
+AuraJournal
+
+Short Description:
+Nhật ký thoại cục bộ riêng tư & trình theo dõi căng thẳng ngoại tuyến.
+
+Full Description:
+AuraJournal là không gian nhật ký thoại tối giản và thân thiện, được xây dựng để bảo vệ quyền riêng tư tuyệt đối của bạn. Suy ngẫm về ngày của bạn, theo dõi thói quen và nhận thông tin phân tích cảm xúc chỉ bằng một lần chạm — hoàn toàn ngoại tuyến.
+
+Bằng cách kết hợp chuyển đổi giọng nói thành văn bản cục bộ với phân tích ngôn ngữ tự nhiên trên thiết bị, AuraJournal đảm bảo các ghi chép cá nhân nhất của bạn không bao giờ rời khỏi điện thoại. Không đăng ký, không máy chủ đám mây và không theo dõi dữ liệu.
+
+CÁC TÍNH NĂNG CHÍNH:
+1. Ghi nhật ký bằng giọng nói một chạm: Ghi lại các phiên suy ngẫm giọng nói dài tối đa 60 giây với phản hồi hình ảnh mượt mà.
+2. Giọng nói thành văn bản ngoại tuyến: Bản dịch cục bộ thời gian thực tận dụng tính năng nhận dạng giọng nói cấp hệ thống của Android mà không cần tải âm thanh lên máy chủ bên ngoài.
+3. Phân tích AI trên thiết bị: Trích xuất ngay lập tức các chủ đề chính (Sự nghiệp, Mối quan hệ, Thể dục, Giấc ngủ), mức độ căng thẳng (Thấp, Trung bình, Cao) và thói quen cục bộ.
+4. Bảng xu hướng hàng tuần: Biểu đồ xu hướng và theo dõi thói quen tuyệt đẹp được xây dựng bằng Compose Canvas (Premium).
+5. Tính di động JSON cục bộ: Xuất và nhập các tệp sao lưu JSON an toàn trực tiếp trên thiết bị bằng Share Sheet của Android.
+6. Đồng hành Wear OS: Ghi lại giọng nói trên đồng hồ và đồng bộ trực tiếp với điện thoại đồng hành của bạn.
+7. Hỗ trợ Android Auto: Ghi âm an toàn và tiện lợi trong quá trình đi lại hàng ngày.
+
+THIẾT KẾ ĐẶT QUYỀN RIÊNG TƯ LÊN HÀNG ĐẦU:
+AuraJournal hoạt động ngoại tuyến 100%. Cơ sở dữ liệu nằm cục bộ trong Room SQLite và chúng tôi không sử dụng máy chủ ghi dữ liệu trung tâm. Giọng nói của bạn là của riêng bạn.
+
+
+=== Chinese (China) - zh-CN ===
+
+Title:
+AuraJournal
+
+Short Description:
+隐私第一的本地语音日记与离线情绪压力追踪器。
+
+Full Description:
+AuraJournal 是一个注重感官体验、极简的语音反思空间，旨在保护您的绝对隐私。只需轻轻一按，即可记录一天的想法、追踪习惯并获取情绪分析——完全离线。
+
+通过将本地语音转文字功能与设备上的自然语言处理分析相结合，AuraJournal 确保您最私密的反思内容永远不会离开您的手机。无需登录，无云端服务器，更无任何数据追踪。
+
+主要功能：
+1. 一键语音记录：录制长达 60 秒的语音反思，并伴有感官友好的视觉动画反馈。
+2. 离线语音转文字：利用 Android 系统级语音识别进行实时本地转写，无需将音频上传到外部服务器。
+3. 设备端 AI 分析：在本地即时提取核心主题（职业、人际关系、健身、睡眠）、压力水平（低、中、高）和习惯指标。
+4. 每周趋势面板：使用 Compose Canvas 构建的精美压力趋势图与习惯追踪图表（Premium）。
+5. 本地 JSON 便携性：使用 Android 分享菜单直接在设备上导出和导入安全的 JSON 备份文件。
+6. Wear OS 伴侣：在手表上记录语音条目，并直接同步到您的伴侣手机上。
+7. Android Auto 支持：在日常通勤中安全地进行语音记录与反思。
+
+隐私第一的设计：
+AuraJournal 100% 离线运行。数据库使用 Room SQLite 本地存储在设备中，我们不使用任何中央数据记录服务器。您的声音完全属于您自己。

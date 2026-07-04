@@ -102,7 +102,7 @@ Since AuraJournal supports **15 languages**, here are localized listings for key
 ## 4. Visual Assets & Brand Identity
 
 We have generated and saved high-quality production visual assets in the repository:
-* **Play Store App Icon** (512x512): [metadata/play_store/app_icon.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/app_icon.png)
-* **Play Store Feature Graphic Banner** (1024x500): [metadata/play_store/feature_graphic.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/feature_graphic.png)
-* **Android TV Leanback Banner** (320x180): [metadata/play_store/tv_banner.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/tv_banner.png)
+* **Play Store App Icon** (512x512 PNG): [metadata/play_store/app_icon.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/app_icon.png)
+* **Play Store Feature Graphic Banner** (1024x500 PNG): [metadata/play_store/feature_graphic.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/feature_graphic.png)
+* **Android TV Leanback Banner** (1280x720 PNG): [metadata/play_store/tv_banner.png](file:///Users/user/AndroidStudioProjects/local-voice-journal/metadata/play_store/tv_banner.png)
 

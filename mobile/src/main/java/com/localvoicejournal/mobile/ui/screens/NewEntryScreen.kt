@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -19,12 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun NewEntryScreen() {
+fun NewEntryScreen(
+    onSave: (String, String) -> Unit,
+    onBack: () -> Unit
+) {
     var title by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("New Entry", modifier = Modifier.align(Alignment.CenterHorizontally))
+        Box(modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+            Text("New Entry", modifier = Modifier.align(Alignment.Center))
+        }
         TextField(
             value = title,
             onValueChange = { title = it },
@@ -39,7 +51,7 @@ fun NewEntryScreen() {
         )
         Box(modifier = Modifier.fillMaxWidth()) {
             Button(
-                onClick = { /* TODO: Handle save */ },
+                onClick = { onSave(title, note) },
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 Text("Save")
@@ -51,5 +63,5 @@ fun NewEntryScreen() {
 @Preview(showBackground = true)
 @Composable
 fun NewEntryScreenPreview() {
-    NewEntryScreen()
+    NewEntryScreen(onSave = { _, _ -> }, onBack = {})
 }

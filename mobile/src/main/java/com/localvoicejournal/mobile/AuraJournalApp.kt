@@ -8,8 +8,8 @@ class AuraJournalApp : Application() {
     override fun onCreate() {
         super.onCreate()
         
-        // Initialize AdMob
-        MobileAds.initialize(this) {}
+        // Initialize AdMob & Preload Interstitials
+        com.localvoicejournal.mobile.util.AdsHelper.initialize(this)
         
         // Initialize Remote Config
         RemoteConfigHelper.fetchAndActivate()

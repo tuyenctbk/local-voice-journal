@@ -45,14 +45,15 @@ class RecordingService : Service() {
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher) // Using existing launcher icon
-            .setContentTitle("Recording Reflection")
-            .setContentText("Listening...")
+            .setContentTitle(getString(R.string.recording_reflection))
+            .setContentText(getString(R.string.listening))
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(pendingIntent)
 
         val ongoingActivityStatus = Status.Builder()
-            .addPart(Status.StopwatchPart(startTime))
+            .addPart("status", Status.TextPart(getString(R.string.reflecting)))
+            .addPart("duration", Status.StopwatchPart(startTime, -1L, -1L))
             .build()
 
         val ongoingActivity = OngoingActivity.Builder(
@@ -78,7 +79,7 @@ class RecordingService : Service() {
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "Recording Service Channel",
+            getString(R.string.recording_service_channel),
             NotificationManager.IMPORTANCE_LOW
         )
         val manager = getSystemService(NotificationManager::class.java)

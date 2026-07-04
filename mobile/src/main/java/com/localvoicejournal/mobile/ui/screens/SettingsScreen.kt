@@ -33,6 +33,7 @@ fun SettingsScreen(
     onPremiumToggled: (Boolean) -> Unit,
     onClearAllData: () -> Unit,
     onExportBackup: () -> Unit = {},
+    onPopulateDemoData: () -> Unit = {},
     onBack: () -> Unit,
     onRequestReview: () -> Unit,
     showBackButton: Boolean = true
@@ -154,6 +155,14 @@ fun SettingsScreen(
                         title = "Export Local Backup (JSON)",
                         subtitle = "Generates and exports a JSON copy of your journal reflections",
                         onClick = onExportBackup
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    SettingsItem(
+                        title = "Populate Demo Data",
+                        subtitle = "Inserts 10 realistic journal entries for dashboard and visualization testing",
+                        onClick = onPopulateDemoData
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))

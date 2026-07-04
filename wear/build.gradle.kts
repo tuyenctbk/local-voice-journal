@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId = "com.localvoicejournal.app"
         minSdk = 30 // Wear OS 3.0+
-        targetSdk = 37
-        versionCode = 1
+        targetSdk = 36
+        versionCode = 1023
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.wear.compose.material)
     implementation(libs.androidx.wear.compose.foundation)
     implementation(libs.androidx.wear.compose.navigation)
+    implementation(libs.androidx.wear.ongoing)
 
     // Play Services Wearable
     implementation(libs.play.services.wearable)
