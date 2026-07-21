@@ -2,6 +2,7 @@ package com.localvoicejournal.mobile.ai
 
 import android.content.Context
 import android.util.Log
+import com.localvoicejournal.core.data.HabitConstants
 
 data class AnalysisResult(
     val stressLevel: String, // "LOW", "MEDIUM", "HIGH"
@@ -80,19 +81,19 @@ class FallbackLocalAnalyzer : LocalAIAnalyzer {
         // 4. Track Habits mentioned positively/actively
         val habits = mutableListOf<String>()
         if (lowercase.contains("water") || lowercase.contains("hydrat")) {
-            habits.add("Hydrated")
+            habits.add(HabitConstants.HYDRATED)
         }
         if (lowercase.contains("walk") || lowercase.contains("gym") || lowercase.contains("workout") || lowercase.contains("exercise") || lowercase.contains("run")) {
-            habits.add("Exercised")
+            habits.add(HabitConstants.EXERCISED)
         }
         if (lowercase.contains("read") || lowercase.contains("book")) {
-            habits.add("Read Book")
+            habits.add(HabitConstants.READ_BOOK)
         }
         if (lowercase.contains("meditat") || lowercase.contains("breathed") || lowercase.contains("calm")) {
-            habits.add("Meditated")
+            habits.add(HabitConstants.MEDITATED)
         }
         if (lowercase.contains("sleep early") || lowercase.contains("rested well") || lowercase.contains("rested")) {
-            habits.add("Good Sleep")
+            habits.add(HabitConstants.GOOD_SLEEP)
         }
 
         return AnalysisResult(

@@ -6,6 +6,8 @@ import androidx.car.app.model.Action
 import androidx.car.app.model.CarColor
 import androidx.car.app.model.MessageTemplate
 import androidx.car.app.model.Template
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.localvoicejournal.core.data.JournalDatabase
 import com.localvoicejournal.core.data.JournalEntry
 import com.localvoicejournal.mobile.ai.FallbackLocalAnalyzer
@@ -16,12 +18,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class JournalCarScreen(carContext: CarContext) : Screen(carContext) {
+class JournalCarScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleObserver {
 
     private var isRecording = false
     private var statusText = "Ready to record your drive reflection."
     private var countdown = 60
     private var recordingJob: Job? = null
+
+    init {
+        lifecycle.addObserver(this)
+    }
 
     override fun onGetTemplate(): Template {
         val actionText = if (isRecording) {
@@ -47,6 +53,10 @@ class JournalCarScreen(carContext: CarContext) : Screen(carContext) {
             .setHeaderAction(Action.APP_ICON)
             .addAction(recordAction)
             .build()
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        stopRecording()
     }
 
     private fun startRecording() {

@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.localvoicejournal.core.data.JournalDatabase
 import com.localvoicejournal.core.data.JournalEntry
+import com.localvoicejournal.core.data.HabitConstants
 import com.localvoicejournal.mobile.ai.AnalysisResult
 import com.localvoicejournal.mobile.ai.OnDeviceModelAnalyzer
 import com.localvoicejournal.mobile.audio.SpeechToTextManager
@@ -147,9 +148,9 @@ class MainActivity : ComponentActivity() {
 
             // Observe finalized STT transcripts
             LaunchedEffect(Unit) {
-                sttManager.onTranscriptReady.collect { transcript ->
+                sttManager.onTranscriptReady.collect { (transcript, duration) ->
                     if (transcript.isNotEmpty()) {
-                        saveReflection(transcript, 60)
+                        saveReflection(transcript, duration)
                     } else {
                         Toast.makeText(this@MainActivity, "No transcription captured.", Toast.LENGTH_SHORT).show()
                     }
@@ -270,7 +271,7 @@ class MainActivity : ComponentActivity() {
                                                 requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                                             }
                                         },
-                                        onStopRecording = {
+                                        onStopRecording = { _ ->
                                             sttManager.stopListening()
                                         },
                                         onCancelRecording = {
@@ -296,7 +297,6 @@ class MainActivity : ComponentActivity() {
                                     NewEntryScreen(
                                         onSave = { title, note ->
                                             saveReflection(note, 0, title)
-                                            currentScreen = AppScreen.HOME
                                         },
                                         onBack = {
                                             currentScreen = AppScreen.HOME
@@ -398,7 +398,7 @@ class MainActivity : ComponentActivity() {
                             androidx.compose.material3.TextButton(
                                 onClick = {
                                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                                        data = android.net.Uri.parse("https://play.google.com/store/apps/details?id=com.localvoicejournal.mobile")
+                                        data = android.net.Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
                                     }
                                     startActivity(intent)
                                 }
@@ -426,7 +426,7 @@ class MainActivity : ComponentActivity() {
                 val reviewInfo = task.result
                 val flow = manager.launchReviewFlow(this, reviewInfo)
                 flow.addOnCompleteListener {
-                    Toast.makeText(this, "Rating suggest complete.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Rating suggestion complete.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this, "Review suggestion complete (Simulation)", Toast.LENGTH_SHORT).show()
@@ -447,9 +447,9 @@ class MainActivity : ComponentActivity() {
                 val jsonBuilder = StringBuilder()
                 jsonBuilder.append("[\n")
                 entries.forEachIndexed { index, entry ->
-                    val themesJson = entry.themes.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
-                    val stressorsJson = entry.stressors.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
-                    val habitsJson = entry.habits.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val themesJson = if (entry.themes.isEmpty()) "" else entry.themes.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val stressorsJson = if (entry.stressors.isEmpty()) "" else entry.stressors.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val habitsJson = if (entry.habits.isEmpty()) "" else entry.habits.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
                     
                     jsonBuilder.append("  {\n")
                     jsonBuilder.append("    \"id\": ${entry.id},\n")
@@ -542,16 +542,16 @@ class MainActivity : ComponentActivity() {
                 )
                 
                 val habitsList = listOf(
-                    listOf("Hydration", "Good Sleep"),
-                    listOf("Hydration"),
-                    listOf("Good Sleep"),
+                    listOf(HabitConstants.HYDRATED, HabitConstants.GOOD_SLEEP),
+                    listOf(HabitConstants.HYDRATED),
+                    listOf(HabitConstants.GOOD_SLEEP),
                     emptyList(),
-                    listOf("Exercise", "Good Sleep"),
-                    listOf("Hydration"),
-                    listOf("Good Sleep"),
+                    listOf(HabitConstants.EXERCISED, HabitConstants.GOOD_SLEEP),
+                    listOf(HabitConstants.HYDRATED),
+                    listOf(HabitConstants.GOOD_SLEEP),
                     emptyList(),
-                    listOf("Good Sleep"),
-                    listOf("Hydration")
+                    listOf(HabitConstants.GOOD_SLEEP),
+                    listOf(HabitConstants.HYDRATED)
                 )
                 
                 for (i in 0 until 10) {

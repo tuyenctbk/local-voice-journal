@@ -48,7 +48,7 @@ object AdsHelper {
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             context,
-            "ca-app-pub-3940256099942544/1033173712", // Interstitial Test ID
+            com.localvoicejournal.mobile.BuildConfig.ADMOB_INTERSTITIAL_ID,
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
@@ -136,7 +136,7 @@ object AdsHelper {
                             screenWidth
                         )
                     )
-                    adUnitId = "ca-app-pub-3940256099942544/9214589741" // Anchored Adaptive Banner Test ID
+                    adUnitId = com.localvoicejournal.mobile.BuildConfig.ADMOB_BANNER_ID
                     loadAd(AdRequest.Builder().build())
                 }
             }
@@ -175,7 +175,7 @@ object AdsHelper {
         var loadFailed by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-            val adLoader = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110") // Native Advanced Test ID
+            val adLoader = AdLoader.Builder(context, com.localvoicejournal.mobile.BuildConfig.ADMOB_NATIVE_ID) // Native Advanced Test ID
                 .forNativeAd { ad ->
                     nativeAdState = ad
                 }

@@ -23,6 +23,7 @@ class SpeechToTextManager(private val context: Context) {
 
     private var speechRecognizer: SpeechRecognizer? = null
     private var simulatedJob: Job? = null
+    private var recordingStartTime = 0L
 
     private val _transcript = MutableStateFlow("")
     val transcript: StateFlow<String> = _transcript
@@ -33,8 +34,8 @@ class SpeechToTextManager(private val context: Context) {
     private val _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
-    private val _onTranscriptReady = MutableSharedFlow<String>(extraBufferCapacity = 1)
-    val onTranscriptReady: SharedFlow<String> = _onTranscriptReady
+    private val _onTranscriptReady = MutableSharedFlow<Pair<String, Int>>(extraBufferCapacity = 1)
+    val onTranscriptReady: SharedFlow<Pair<String, Int>> = _onTranscriptReady
 
     private val _soundLevel = MutableStateFlow(0f) // Normalized RMS dB, e.g. 0.0 to 1.0
     val soundLevel: StateFlow<Float> = _soundLevel
@@ -49,6 +50,7 @@ class SpeechToTextManager(private val context: Context) {
         _isRecording.value = true
         _isProcessing.value = false
         _status.value = "Listening..."
+        recordingStartTime = System.currentTimeMillis()
 
         if (isRecognizerAvailable) {
             try {
@@ -98,7 +100,8 @@ class SpeechToTextManager(private val context: Context) {
             }
             _status.value = "Analysis complete"
             _isProcessing.value = false
-            _onTranscriptReady.tryEmit(_transcript.value)
+            val duration = ((System.currentTimeMillis() - recordingStartTime) / 1000).toInt().coerceIn(1, 60)
+            _onTranscriptReady.tryEmit(_transcript.value to duration)
         }
     }
 
@@ -200,7 +203,8 @@ class SpeechToTextManager(private val context: Context) {
                 val fallback = getFallbackTranscript()
                 _transcript.value = fallback
                 _isProcessing.value = false
-                _onTranscriptReady.tryEmit(fallback)
+                val duration = ((System.currentTimeMillis() - recordingStartTime) / 1000).toInt().coerceIn(1, 60)
+                _onTranscriptReady.tryEmit(fallback to duration)
             } else {
                 _status.value = "$message. Try again."
                 _isProcessing.value = false
@@ -218,7 +222,8 @@ class SpeechToTextManager(private val context: Context) {
             _isRecording.value = false
             _isProcessing.value = false
             _status.value = "Analysis complete"
-            _onTranscriptReady.tryEmit(finalTranscript)
+            val duration = ((System.currentTimeMillis() - recordingStartTime) / 1000).toInt().coerceIn(1, 60)
+            _onTranscriptReady.tryEmit(finalTranscript to duration)
         }
 
         override fun onPartialResults(partialResults: Bundle?) {

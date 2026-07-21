@@ -27,7 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.localvoicejournal.core.data.JournalEntry
+import com.localvoicejournal.core.data.HabitConstants
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -212,19 +215,19 @@ fun DashboardScreen(
                     ) {
                         HabitStatCard(
                             title = "Hydration",
-                            count = entries.count { it.habits.contains("Hydrated") },
+                            count = entries.count { it.habits.contains(HabitConstants.HYDRATED) },
                             color = Color(0xFF00B0FF),
                             modifier = Modifier.weight(1f)
                         )
                         HabitStatCard(
                             title = "Exercise",
-                            count = entries.count { it.habits.contains("Exercised") },
+                            count = entries.count { it.habits.contains(HabitConstants.EXERCISED) },
                             color = Color(0xFFFF4081),
                             modifier = Modifier.weight(1f)
                         )
                         HabitStatCard(
                             title = "Good Sleep",
-                            count = entries.count { it.habits.contains("Good Sleep") },
+                            count = entries.count { it.habits.contains(HabitConstants.GOOD_SLEEP) },
                             color = Color(0xFF7C4DFF),
                             modifier = Modifier.weight(1f)
                         )
@@ -353,7 +356,8 @@ fun DashboardScreen(
 
 @Composable
 fun StressChart(modifier: Modifier, entries: List<JournalEntry>) {
-    Canvas(modifier = modifier) {
+    val description = if (entries.isEmpty()) "No stress data available" else "Stress level trend for the last ${entries.size} reflections"
+    Canvas(modifier = modifier.semantics { contentDescription = description }) {
         val width = size.width
         val height = size.height
 

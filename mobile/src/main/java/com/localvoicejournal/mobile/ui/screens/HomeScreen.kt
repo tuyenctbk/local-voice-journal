@@ -42,7 +42,7 @@ fun HomeScreen(
     liveTranscript: String,
     soundLevel: Float,
     onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
+    onStopRecording: (Int) -> Unit,
     onCancelRecording: () -> Unit = {},
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -52,6 +52,7 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     var recordingSeconds by remember { mutableStateOf(60) }
+    var elapsedSeconds by remember { mutableStateOf(0) }
 
     var showAdAfterDelay by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -73,13 +74,15 @@ fun HomeScreen(
     LaunchedEffect(isRecording) {
         if (isRecording) {
             recordingSeconds = 60
+            elapsedSeconds = 0
             while (recordingSeconds > 0 && isRecording) {
                 delay(1000)
                 recordingSeconds--
+                elapsedSeconds++
             }
             if (recordingSeconds == 0 && isRecording) {
                 triggerHaptic()
-                onStopRecording()
+                onStopRecording(60)
             }
         } else {
             recordingSeconds = 60
@@ -223,7 +226,7 @@ fun HomeScreen(
                                 indication = null
                             ) {
                                 triggerHaptic()
-                                if (isRecording) onStopRecording() else onStartRecording()
+                                if (isRecording) onStopRecording(elapsedSeconds) else onStartRecording()
                             }
                     ) {
                         if (isProcessing) {

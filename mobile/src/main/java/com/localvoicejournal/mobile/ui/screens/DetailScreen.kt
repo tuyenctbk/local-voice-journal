@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.localvoicejournal.core.data.JournalEntry
+import com.localvoicejournal.core.data.HabitConstants
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -340,7 +341,7 @@ fun PreviewDetailScreen() {
             stressLevel = "MEDIUM",
             themes = listOf("Career", "Emotional State"),
             stressors = listOf("Deadlines"),
-            habits = listOf("Hydrated", "Exercised"),
+            habits = listOf(HabitConstants.HYDRATED, HabitConstants.EXERCISED),
             durationSeconds = 45
         ),
         onBack = {},

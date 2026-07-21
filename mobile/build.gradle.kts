@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,12 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.kapt)
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -15,21 +23,32 @@ android {
         applicationId = "com.localvoicejournal.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1031
+        versionCode = 1041
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // AdMob IDs from local.properties
+        val admobAppId = localProperties.getProperty("ADMOB_APP_ID") ?: ""
+        val admobBannerId = localProperties.getProperty("ADMOB_BANNER_ID") ?: ""
+        val admobInterstitialId = localProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: ""
+        val admobNativeId = localProperties.getProperty("ADMOB_NATIVE_ID") ?: ""
+
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerId\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
+        buildConfigField("String", "ADMOB_NATIVE_ID", "\"$admobNativeId\"")
     }
 
     signingConfigs {
         create("release") {
             storeFile = rootProject.file("common_release_key.jks")
-            storePassword = "dpadhero123"
-            keyAlias = "dpad_hero_alias"
-            keyPassword = "dpadhero123"
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD") ?: ""
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS") ?: ""
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD") ?: ""
         }
     }
 
@@ -42,6 +61,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_NATIVE_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -52,6 +76,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.5"
