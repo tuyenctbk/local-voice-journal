@@ -174,11 +174,38 @@ fun DetailScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Duration: ${entry.durationSeconds}s",
-                            fontSize = 12.sp,
-                            color = Color(0xFF8682A8)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Duration: ${entry.durationSeconds}s",
+                                fontSize = 12.sp,
+                                color = Color(0xFF8682A8)
+                            )
+                            
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                val weatherVal = entry.weather ?: ""
+                                val locationVal = entry.location ?: ""
+                                
+                                if (locationVal.isNotEmpty()) {
+                                    Text(
+                                        text = "📍 $locationVal",
+                                        fontSize = 12.sp,
+                                        color = if (locationVal.contains("Offline")) Color(0xFF6B6888) else Color(0xFFC0B3FF),
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                }
+                                if (weatherVal.isNotEmpty() && weatherVal != "Unknown Weather") {
+                                    Text(
+                                        text = "🌦️ $weatherVal",
+                                        fontSize = 12.sp,
+                                        color = Color(0xFF9E8EFF)
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     // Local AI analysis card

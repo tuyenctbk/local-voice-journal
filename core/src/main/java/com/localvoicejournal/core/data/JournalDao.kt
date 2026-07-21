@@ -6,24 +6,46 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Dao
-interface JournalDao {
+abstract class JournalDao {
     @Query("SELECT * FROM journal_entries ORDER BY timestamp DESC")
-    fun getAllEntries(): Flow<List<JournalEntry>>
+    protected abstract fun _getAllEntries(): Flow<List<JournalEntry>>
+
+    fun getAllEntries(): Flow<List<JournalEntry>> {
+        return _getAllEntries().map { list ->
+            list.map { it.copy(transcript = CryptographyHelper.decryptTranscript(it.transcript)) }
+        }
+    }
 
     @Query("SELECT * FROM journal_entries WHERE id = :id LIMIT 1")
-    fun getEntryById(id: Long): Flow<JournalEntry?>
+    protected abstract fun _getEntryById(id: Long): Flow<JournalEntry?>
+
+    fun getEntryById(id: Long): Flow<JournalEntry?> {
+        return _getEntryById(id).map { entry ->
+            entry?.copy(transcript = CryptographyHelper.decryptTranscript(entry.transcript))
+        }
+    }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEntry(entry: JournalEntry): Long
+    protected abstract suspend fun _insertEntry(entry: JournalEntry): Long
+
+    suspend fun insertEntry(entry: JournalEntry): Long {
+        val encryptedEntry = entry.copy(transcript = CryptographyHelper.encryptTranscript(entry.transcript))
+        return _insertEntry(encryptedEntry)
+    }
 
     @Delete
-    suspend fun deleteEntry(entry: JournalEntry)
+    abstract suspend fun deleteEntry(entry: JournalEntry)
 
     @Query("DELETE FROM journal_entries")
-    suspend fun clearAllEntries()
+    abstract suspend fun clearAllEntries()
 
     @Query("SELECT * FROM journal_entries ORDER BY timestamp DESC")
-    suspend fun getAllEntriesList(): List<JournalEntry>
+    protected abstract suspend fun _getAllEntriesList(): List<JournalEntry>
+
+    suspend fun getAllEntriesList(): List<JournalEntry> {
+        return _getAllEntriesList().map { it.copy(transcript = CryptographyHelper.decryptTranscript(it.transcript)) }
+    }
 }

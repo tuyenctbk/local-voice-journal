@@ -128,6 +128,12 @@ dependencies {
     // AdMob
     implementation(libs.google.admob)
 
+    // MediaPipe Tasks-GenAI for on-device LLM
+    implementation(libs.mediapipe.tasks.genai)
+
+    // Google Play Services Sign-In
+    implementation(libs.play.services.auth)
+
     // Play In-App Review
     implementation(libs.play.review)
     implementation(libs.play.review.ktx)

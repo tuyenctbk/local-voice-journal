@@ -14,6 +14,8 @@ kotlinCompose = "2.0.0"
 firebaseVersion = "33.1.0"
 admobVersion = "23.0.0"
 carApp = "1.7.0"
+tasksGenai = "0.10.14"
+playServicesAuth = "21.1.1"
 
 # Compose Versions
 composeBom = "2024.10.00"
@@ -102,6 +104,8 @@ firebase-remoteconfig = { group = "com.google.firebase", name = "firebase-config
 
 # AdMob
 google-admob = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "admobVersion" }
+mediapipe-tasks-genai = { group = "com.google.mediapipe", name = "tasks-genai", version.ref = "tasksGenai" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -20,10 +20,12 @@ import kotlinx.coroutines.launch
 class SpeechToTextManager(private val context: Context) {
 
     private val tag = "SpeechToTextManager"
+    private val sharedPrefs = context.getSharedPreferences("aura_journal_prefs", Context.MODE_PRIVATE)
 
     private var speechRecognizer: SpeechRecognizer? = null
     private var simulatedJob: Job? = null
     private var recordingStartTime = 0L
+    private var isRunningOnlineFallback = false
 
     private val _transcript = MutableStateFlow("")
     val transcript: StateFlow<String> = _transcript
@@ -51,6 +53,7 @@ class SpeechToTextManager(private val context: Context) {
         _isProcessing.value = false
         _status.value = "Listening..."
         recordingStartTime = System.currentTimeMillis()
+        isRunningOnlineFallback = false
 
         if (isRecognizerAvailable) {
             try {
@@ -73,6 +76,31 @@ class SpeechToTextManager(private val context: Context) {
             }
         } else {
             Log.d(tag, "SpeechRecognizer not available on this device, simulating recording")
+            startSimulatedRecording()
+        }
+    }
+
+    private fun startListeningOnline() {
+        if (isRecognizerAvailable) {
+            try {
+                if (speechRecognizer == null) {
+                    speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
+                        setRecognitionListener(createListener())
+                    }
+                }
+                
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                    putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false) // Fallback to online Speech-to-Text
+                    putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                }
+                speechRecognizer?.startListening(intent)
+            } catch (e: Exception) {
+                Log.e(tag, "Online SpeechRecognizer fallback failed, starting simulation", e)
+                startSimulatedRecording()
+            }
+        } else {
             startSimulatedRecording()
         }
     }
@@ -196,18 +224,34 @@ class SpeechToTextManager(private val context: Context) {
             }
             Log.w(tag, "SpeechRecognizer Error: $message ($error)")
             
+            val isCloudFallbackAllowed = sharedPrefs.getBoolean("allow_cloud_fallback", false)
+            if (!isRunningOnlineFallback && isCloudFallbackAllowed && 
+                (error == SpeechRecognizer.ERROR_NETWORK || error == SpeechRecognizer.ERROR_SERVER ||
+                 error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
+                
+                isRunningOnlineFallback = true
+                Log.d(tag, "Local offline STT failed/unavailable (error $error). Attempting online fallback...")
+                _status.value = "Retrying with online fallback..."
+                
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(500)
+                    startListeningOnline()
+                }
+                return
+            }
+            
             _isRecording.value = false
+            _isProcessing.value = false
+            
             // Fallback to simulation/mock if no match or busy so user can still test the app
-            if (error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
+            if (error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NETWORK || error == SpeechRecognizer.ERROR_SERVER) {
                 _status.value = "No voice heard, creating sample entry..."
                 val fallback = getFallbackTranscript()
                 _transcript.value = fallback
-                _isProcessing.value = false
                 val duration = ((System.currentTimeMillis() - recordingStartTime) / 1000).toInt().coerceIn(1, 60)
                 _onTranscriptReady.tryEmit(fallback to duration)
             } else {
                 _status.value = "$message. Try again."
-                _isProcessing.value = false
             }
         }
 

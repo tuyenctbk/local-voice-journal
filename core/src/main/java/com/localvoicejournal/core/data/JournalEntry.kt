@@ -14,5 +14,7 @@ data class JournalEntry(
     val stressors: List<String>,
     val habits: List<String>,
     val durationSeconds: Int,
-    val title: String = ""
+    val title: String = "",
+    val weather: String? = null,
+    val location: String? = null
 )

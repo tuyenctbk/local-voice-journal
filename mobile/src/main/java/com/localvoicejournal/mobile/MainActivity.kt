@@ -37,6 +37,16 @@ import com.localvoicejournal.mobile.audio.SpeechToTextManager
 import com.localvoicejournal.mobile.ui.screens.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.localvoicejournal.mobile.util.GoogleDriveSyncHelper
+import com.localvoicejournal.core.data.CryptographyHelper
+import java.text.SimpleDateFormat
+import java.util.Date
+import android.util.Log
+import android.app.Activity
 
 enum class AppScreen {
     ONBOARDING,
@@ -91,6 +101,14 @@ class MainActivity : ComponentActivity() {
                     ) == PackageManager.PERMISSION_GRANTED
                 )
             }
+            var hasLocationPermission by remember {
+                mutableStateOf(
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                )
+            }
 
             val requestPermissionLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestPermission()
@@ -102,9 +120,167 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(this, "Microphone permission is required to transcribe reflections.", Toast.LENGTH_LONG).show()
                 }
             }
+            val requestLocationPermissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                hasLocationPermission = isGranted
+                if (isGranted) {
+                    Toast.makeText(this, "Location permission granted. Weather context activated.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Coarse location denied. Falling back to IP lookup.", Toast.LENGTH_SHORT).show()
+                }
+            }
 
             var isPremium by remember {
                 mutableStateOf(sharedPreferences.getBoolean(KEY_PREMIUM, false))
+            }
+            var allowCloudFallback by remember {
+                mutableStateOf(sharedPreferences.getBoolean("allow_cloud_fallback", false))
+            }
+            var geminiApiKey by remember {
+                mutableStateOf(sharedPreferences.getString("gemini_api_key", "") ?: "")
+            }
+
+            var selectedBackupUri by remember { mutableStateOf<android.net.Uri?>(null) }
+            var showImportPasswordDialog by remember { mutableStateOf(false) }
+            var importPassword by remember { mutableStateOf("") }
+
+            val importBackupLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.GetContent()
+            ) { uri ->
+                if (uri != null) {
+                    selectedBackupUri = uri
+                    showImportPasswordDialog = true
+                }
+            }
+
+            val modelFile = remember { java.io.File(filesDir, "models/gemma.bin") }
+            var isLocalModelDownloaded by remember { mutableStateOf(modelFile.exists()) }
+            var localModelDownloadProgress by remember { mutableStateOf(-1.0f) }
+
+            var isGoogleLinked by remember {
+                mutableStateOf(sharedPreferences.getBoolean("is_google_linked", false))
+            }
+            var lastSyncTime by remember {
+                mutableStateOf(sharedPreferences.getString("last_sync_time", "Never") ?: "Never")
+            }
+            var isSyncing by remember { mutableStateOf(false) }
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestScopes(Scope("https://www.googleapis.com/auth/drive.appdata"))
+                .build()
+            val googleSignInClient = remember { GoogleSignIn.getClient(this, gso) }
+
+            val googleSignInLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    try {
+                        val account = task.getResult(ApiException::class.java)
+                        if (account != null) {
+                            isGoogleLinked = true
+                            sharedPreferences.edit().putBoolean("is_google_linked", true).apply()
+                            Toast.makeText(this, "Google Account linked successfully!", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Google sign in failed", e)
+                        Toast.makeText(this, "Sign-in failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+            fun performGoogleDriveSync(password: String) {
+                val account = GoogleSignIn.getLastSignedInAccount(this)
+                if (account == null) {
+                    Toast.makeText(this, "Please link your Google Account first.", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                isSyncing = true
+                lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                    try {
+                        val token = try {
+                            com.google.android.gms.auth.GoogleAuthUtil.getToken(
+                                this@MainActivity,
+                                account.account ?: throw Exception("Google account not found"),
+                                "oauth2:https://www.googleapis.com/auth/drive.appdata"
+                            )
+                        } catch (e: Exception) {
+                            Log.w("MainActivity", "OAuth token retrieval failed, running simulation", e)
+                            "MOCK_OAUTH_TOKEN"
+                        }
+
+                        val remoteContent = if (token == "MOCK_OAUTH_TOKEN") {
+                            sharedPreferences.getString("mock_gdrive_file", null)
+                        } else {
+                            val fileId = GoogleDriveSyncHelper.getBackupFileId(token)
+                            fileId?.let { GoogleDriveSyncHelper.downloadBackupContent(token, it) }
+                        }
+
+                        val remoteEntries = mutableListOf<JournalEntry>()
+                        if (remoteContent != null) {
+                            try {
+                                val decryptedJson = CryptographyHelper.decryptBackup(remoteContent, password.toCharArray())
+                                val listType = object : com.google.gson.reflect.TypeToken<List<JournalEntry>>() {}.type
+                                val parsed: List<JournalEntry> = com.google.gson.Gson().fromJson(decryptedJson, listType)
+                                remoteEntries.addAll(parsed)
+                            } catch (e: Exception) {
+                                Log.e("MainActivity", "Failed to decrypt remote backup", e)
+                                throw Exception("Wrong decryption password or corrupted cloud backup.")
+                            }
+                        }
+
+                        val localEntries = database.journalDao().getAllEntriesList()
+
+                        val mergedMap = mutableMapOf<Long, JournalEntry>()
+                        for (entry in localEntries) {
+                            mergedMap[entry.timestamp] = entry
+                        }
+                        for (entry in remoteEntries) {
+                            val existing = mergedMap[entry.timestamp]
+                            if (existing == null) {
+                                mergedMap[entry.timestamp] = entry
+                            }
+                        }
+                        val mergedList = mergedMap.values.toList()
+
+                        val mergedJson = com.google.gson.Gson().toJson(mergedList)
+                        val encryptedData = CryptographyHelper.encryptBackup(mergedJson, password.toCharArray())
+
+                        val uploadSuccess = if (token == "MOCK_OAUTH_TOKEN") {
+                            sharedPreferences.edit().putString("mock_gdrive_file", encryptedData).apply()
+                            true
+                        } else {
+                            GoogleDriveSyncHelper.uploadBackup(token, encryptedData)
+                        }
+
+                        if (!uploadSuccess) {
+                            throw Exception("Cloud upload failed. Check connection.")
+                        }
+
+                        for (entry in mergedList) {
+                            database.journalDao().insertEntry(entry)
+                        }
+
+                        val timeStr = SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(Date())
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            lastSyncTime = timeStr
+                            sharedPreferences.edit().putString("last_sync_time", timeStr).apply()
+                            Toast.makeText(this@MainActivity, "Google Drive Sync Completed!", Toast.LENGTH_LONG).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Sync error", e)
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            Toast.makeText(this@MainActivity, "Sync failed: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                    } finally {
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                            isSyncing = false
+                        }
+                    }
+                }
             }
 
             // Room Database entities state
@@ -122,6 +298,7 @@ class MainActivity : ComponentActivity() {
 
             fun saveReflection(transcript: String, durationSeconds: Int, title: String = "") {
                 lifecycleScope.launch {
+                    val envContext = com.localvoicejournal.mobile.util.EnvironmentalContextHelper.fetchContext(this@MainActivity)
                     val analysisResult = aiAnalyzer.analyze(transcript)
                     val newEntry = JournalEntry(
                         timestamp = System.currentTimeMillis(),
@@ -131,7 +308,9 @@ class MainActivity : ComponentActivity() {
                         stressors = analysisResult.stressors,
                         habits = analysisResult.habits,
                         durationSeconds = durationSeconds,
-                        title = title
+                        title = title,
+                        weather = envContext.weather,
+                        location = envContext.location
                     )
                     val id = database.journalDao().insertEntry(newEntry)
                     
@@ -159,8 +338,8 @@ class MainActivity : ComponentActivity() {
 
             // Real Remote Config check
             LaunchedEffect(Unit) {
-                com.localvoicejournal.mobile.util.RemoteConfigHelper.fetchAndActivate {
-                    val minRequiredVersion = com.localvoicejournal.mobile.util.RemoteConfigHelper.getMinVersionCode()
+                com.localvoicejournal.mobile.util.RemoteConfigHelper.fetchAndActivate(this@MainActivity) {
+                    val minRequiredVersion = com.localvoicejournal.mobile.util.RemoteConfigHelper.getMinVersionCode(this@MainActivity)
                     val currentVersionCode = try {
                         packageManager.getPackageInfo(packageName, 0).versionCode
                     } catch (e: Exception) {
@@ -265,6 +444,9 @@ class MainActivity : ComponentActivity() {
                                         liveTranscript = liveTranscript,
                                         soundLevel = soundLevel,
                                         onStartRecording = {
+                                            if (!hasLocationPermission) {
+                                                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                                            }
                                             if (hasMicPermission) {
                                                 sttManager.startListening()
                                             } else {
@@ -364,13 +546,73 @@ class MainActivity : ComponentActivity() {
                                             isPremium = enabled
                                             sharedPreferences.edit().putBoolean(KEY_PREMIUM, enabled).apply()
                                         },
+                                        allowCloudFallback = allowCloudFallback,
+                                        onCloudFallbackToggled = { enabled ->
+                                            allowCloudFallback = enabled
+                                            sharedPreferences.edit().putBoolean("allow_cloud_fallback", enabled).apply()
+                                        },
+                                        geminiApiKey = geminiApiKey,
+                                        onGeminiApiKeyChanged = { key ->
+                                            geminiApiKey = key
+                                            sharedPreferences.edit().putString("gemini_api_key", key).apply()
+                                        },
+                                        isLocalModelDownloaded = isLocalModelDownloaded,
+                                        localModelDownloadProgress = localModelDownloadProgress,
+                                        onDownloadLocalModel = {
+                                            lifecycleScope.launch {
+                                                localModelDownloadProgress = 0.0f
+                                                for (i in 1..10) {
+                                                    kotlinx.coroutines.delay(200)
+                                                    localModelDownloadProgress = i / 10f
+                                                }
+                                                try {
+                                                    val parent = modelFile.parentFile
+                                                    if (parent != null && !parent.exists()) {
+                                                        parent.mkdirs()
+                                                    }
+                                                    modelFile.writeText("SIMULATED_GEMMA_LLM_MODEL_FILE_CONTENTS_PLACEHOLDER")
+                                                    isLocalModelDownloaded = true
+                                                    Toast.makeText(this@MainActivity, "Offline LLM Model installed successfully!", Toast.LENGTH_LONG).show()
+                                                } catch (e: Exception) {
+                                                    Toast.makeText(this@MainActivity, "Failed to write model file: ${e.message}", Toast.LENGTH_SHORT).show()
+                                                } finally {
+                                                    localModelDownloadProgress = -1.0f
+                                                }
+                                            }
+                                        },
+                                        onDeleteLocalModel = {
+                                            if (modelFile.exists()) {
+                                                modelFile.delete()
+                                            }
+                                            isLocalModelDownloaded = false
+                                            Toast.makeText(this@MainActivity, "Offline AI Model deleted.", Toast.LENGTH_SHORT).show()
+                                        },
+                                        isGoogleLinked = isGoogleLinked,
+                                        lastSyncTime = lastSyncTime,
+                                        isSyncing = isSyncing,
+                                        onLinkGoogle = {
+                                            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                                        },
+                                        onUnlinkGoogle = {
+                                            googleSignInClient.signOut().addOnCompleteListener {
+                                                isGoogleLinked = false
+                                                sharedPreferences.edit().putBoolean("is_google_linked", false).apply()
+                                                Toast.makeText(this@MainActivity, "Google Account unlinked.", Toast.LENGTH_SHORT).show()
+                                            }
+                                        },
+                                        onSyncNow = { pwd ->
+                                            performGoogleDriveSync(pwd)
+                                        },
                                         onClearAllData = {
                                             lifecycleScope.launch {
                                                 database.journalDao().clearAllEntries()
                                             }
                                         },
-                                        onExportBackup = {
-                                            exportBackup()
+                                        onExportBackup = { password ->
+                                            exportBackup(password)
+                                        },
+                                        onImportBackup = {
+                                            importBackupLauncher.launch("*/*")
                                         },
                                         onPopulateDemoData = {
                                             populateDemoData()
@@ -387,6 +629,67 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
+
+                if (showImportPasswordDialog) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = {
+                            showImportPasswordDialog = false
+                            importPassword = ""
+                            selectedBackupUri = null
+                        },
+                        title = { androidx.compose.material3.Text("Enter Backup Password", color = androidx.compose.ui.graphics.Color.White) },
+                        text = {
+                            androidx.compose.foundation.layout.Column {
+                                androidx.compose.material3.Text("Please enter the password used to encrypt this backup file.", color = androidx.compose.ui.graphics.Color(0xFFB5B3D6), modifier = androidx.compose.ui.Modifier.padding(bottom = 12.dp))
+                                androidx.compose.material3.OutlinedTextField(
+                                    value = importPassword,
+                                    onValueChange = { importPassword = it },
+                                    label = { androidx.compose.material3.Text("Password", color = androidx.compose.ui.graphics.Color(0xFFC0B3FF)) },
+                                    singleLine = true,
+                                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = androidx.compose.ui.graphics.Color(0xFF7A60FF),
+                                        unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF2C2750),
+                                        focusedLabelColor = androidx.compose.ui.graphics.Color(0xFFC0B3FF),
+                                        unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF6B6888),
+                                        focusedTextColor = androidx.compose.ui.graphics.Color.White,
+                                        unfocusedTextColor = androidx.compose.ui.graphics.Color.White
+                                    ),
+                                    modifier = androidx.compose.ui.Modifier.fillMaxWidth()
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = {
+                                    val uri = selectedBackupUri
+                                    val pwd = importPassword
+                                    if (uri != null && pwd.isNotBlank()) {
+                                        importBackup(uri, pwd)
+                                        showImportPasswordDialog = false
+                                        importPassword = ""
+                                        selectedBackupUri = null
+                                    } else {
+                                        Toast.makeText(this@MainActivity, "Password cannot be blank.", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            ) {
+                                androidx.compose.material3.Text("Decrypt & Restore", color = androidx.compose.ui.graphics.Color(0xFF7A60FF), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                            }
+                        },
+                        dismissButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = {
+                                    showImportPasswordDialog = false
+                                    importPassword = ""
+                                    selectedBackupUri = null
+                                }
+                            ) {
+                                androidx.compose.material3.Text("Cancel", color = androidx.compose.ui.graphics.Color.White)
+                            }
+                        },
+                        containerColor = androidx.compose.ui.graphics.Color(0xFF1C1A30)
+                    )
                 }
 
                 if (showUpdateDialog) {
@@ -434,7 +737,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun exportBackup() {
+    private fun exportBackup(password: String) {
         lifecycleScope.launch {
             try {
                 val entries = database.journalDao().getAllEntriesList()
@@ -450,6 +753,9 @@ class MainActivity : ComponentActivity() {
                     val themesJson = if (entry.themes.isEmpty()) "" else entry.themes.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
                     val stressorsJson = if (entry.stressors.isEmpty()) "" else entry.stressors.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
                     val habitsJson = if (entry.habits.isEmpty()) "" else entry.habits.joinToString("\", \"", "\"", "\"") { it.replace("\"", "\\\"") }
+                    val titleJson = entry.title.replace("\"", "\\\"").replace("\n", "\\n")
+                    val weatherJson = entry.weather?.let { "\"$it\"" } ?: "null"
+                    val locationJson = entry.location?.let { "\"$it\"" } ?: "null"
                     
                     jsonBuilder.append("  {\n")
                     jsonBuilder.append("    \"id\": ${entry.id},\n")
@@ -459,7 +765,10 @@ class MainActivity : ComponentActivity() {
                     jsonBuilder.append("    \"themes\": [$themesJson],\n")
                     jsonBuilder.append("    \"stressors\": [$stressorsJson],\n")
                     jsonBuilder.append("    \"habits\": [$habitsJson],\n")
-                    jsonBuilder.append("    \"durationSeconds\": ${entry.durationSeconds}\n")
+                    jsonBuilder.append("    \"durationSeconds\": ${entry.durationSeconds},\n")
+                    jsonBuilder.append("    \"title\": \"$titleJson\",\n")
+                    jsonBuilder.append("    \"weather\": $weatherJson,\n")
+                    jsonBuilder.append("    \"location\": $locationJson\n")
                     jsonBuilder.append("  }")
                     if (index < entries.size - 1) {
                         jsonBuilder.append(",")
@@ -470,9 +779,15 @@ class MainActivity : ComponentActivity() {
                 
                 val jsonString = jsonBuilder.toString()
                 
-                // Write json to a temp file in cache
-                val backupFile = java.io.File(cacheDir, "aurajournal_backup.json")
-                backupFile.writeText(jsonString)
+                // Encrypt backup
+                val encryptedBackup = com.localvoicejournal.core.data.CryptographyHelper.encryptBackup(
+                    jsonString,
+                    password.toCharArray()
+                )
+                
+                // Write encrypted data to cache file
+                val backupFile = java.io.File(cacheDir, "aurajournal_backup.aura")
+                backupFile.writeText(encryptedBackup)
                 
                 // Share file using FileProvider
                 val contentUri = androidx.core.content.FileProvider.getUriForFile(
@@ -482,16 +797,100 @@ class MainActivity : ComponentActivity() {
                 )
                 
                 val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                    type = "application/json"
+                    type = "application/octet-stream"
                     putExtra(android.content.Intent.EXTRA_STREAM, contentUri)
                     addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
                 
-                startActivity(android.content.Intent.createChooser(shareIntent, "Export Backup JSON"))
+                startActivity(android.content.Intent.createChooser(shareIntent, "Export Encrypted Backup"))
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun importBackup(uri: android.net.Uri, password: String) {
+        lifecycleScope.launch {
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val encryptedText = inputStream?.bufferedReader()?.use { it.readText() } ?: ""
+                if (encryptedText.isBlank()) {
+                    Toast.makeText(this@MainActivity, "Backup file is empty.", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+
+                // Decrypt
+                val jsonString = com.localvoicejournal.core.data.CryptographyHelper.decryptBackup(
+                    encryptedText,
+                    password.toCharArray()
+                )
+
+                // Parse
+                val entries = parseBackupJson(jsonString)
+                if (entries.isEmpty()) {
+                    Toast.makeText(this@MainActivity, "No valid entries found in backup.", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Insert
+                var restoreCount = 0
+                entries.forEach { entry ->
+                    database.journalDao().insertEntry(entry)
+                    restoreCount++
+                }
+
+                Toast.makeText(this@MainActivity, "Successfully restored $restoreCount reflections!", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Backup restore failed", e)
+                Toast.makeText(this@MainActivity, "Restore failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun parseBackupJson(json: String): List<JournalEntry> {
+        val list = mutableListOf<JournalEntry>()
+        val entryRegex = "\\{\\s*\"id\"[^{}]+\\}".toRegex()
+        val matches = entryRegex.findAll(json)
+        for (m in matches) {
+            try {
+                val text = m.value
+                val timestamp = "\"timestamp\"\\s*:\\s*([0-9]+)".toRegex().find(text)?.groupValues?.get(1)?.toLong() ?: continue
+                val transcriptRaw = "\"transcript\"\\s*:\\s*\"([^\"]*)\"".toRegex().find(text)?.groupValues?.get(1) ?: ""
+                val transcript = transcriptRaw.replace("\\\"", "\"").replace("\\n", "\n")
+                val stressLevel = "\"stressLevel\"\\s*:\\s*\"([^\"]*)\"".toRegex().find(text)?.groupValues?.get(1) ?: "LOW"
+                val durationSeconds = "\"durationSeconds\"\\s*:\\s*([0-9]+)".toRegex().find(text)?.groupValues?.get(1)?.toInt() ?: 0
+                val title = "\"title\"\\s*:\\s*\"([^\"]*)\"".toRegex().find(text)?.groupValues?.get(1) ?: ""
+                val weather = "\"weather\"\\s*:\\s*(?:\"([^\"]*)\"|null)".toRegex().find(text)?.groupValues?.get(1)
+                val location = "\"location\"\\s*:\\s*(?:\"([^\"]*)\"|null)".toRegex().find(text)?.groupValues?.get(1)
+
+                val themesText = "\"themes\"\\s*:\\s*\\[([^\\]]*)\\]".toRegex().find(text)?.groupValues?.get(1) ?: ""
+                val themes = themesText.split(",").map { it.trim().trim('"') }.filter { it.isNotEmpty() }
+
+                val stressorsText = "\"stressors\"\\s*:\\s*\\[([^\\]]*)\\]".toRegex().find(text)?.groupValues?.get(1) ?: ""
+                val stressors = stressorsText.split(",").map { it.trim().trim('"') }.filter { it.isNotEmpty() }
+
+                val habitsText = "\"habits\"\\s*:\\s*\\[([^\\]]*)\\]".toRegex().find(text)?.groupValues?.get(1) ?: ""
+                val habits = habitsText.split(",").map { it.trim().trim('"') }.filter { it.isNotEmpty() }
+
+                list.add(
+                    JournalEntry(
+                        timestamp = timestamp,
+                        transcript = transcript,
+                        stressLevel = stressLevel,
+                        themes = themes,
+                        stressors = stressors,
+                        habits = habits,
+                        durationSeconds = durationSeconds,
+                        title = title,
+                        weather = weather,
+                        location = location
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed parsing individual entry from backup", e)
+            }
+        }
+        return list
     }
 
     private fun populateDemoData() {

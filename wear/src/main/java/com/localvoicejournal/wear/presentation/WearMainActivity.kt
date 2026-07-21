@@ -1,11 +1,14 @@
 package com.localvoicejournal.wear.presentation
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Vibrator
+import android.speech.RecognizerIntent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,7 +20,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
 import com.localvoicejournal.wear.R
-import com.localvoicejournal.wear.service.RecordingService
+import com.google.android.gms.wearable.Wearable
 
 class WearMainActivity : ComponentActivity() {
 
@@ -45,6 +47,7 @@ class WearMainActivity : ComponentActivity() {
 
         setContent {
             val context = this
+            val coroutineScope = rememberCoroutineScope()
             var hasPermission by remember {
                 mutableStateOf(
                     ContextCompat.checkSelfPermission(
@@ -60,31 +63,91 @@ class WearMainActivity : ComponentActivity() {
                 hasPermission = isGranted
             }
 
+            var statusText by remember { mutableStateOf("Tap to record") }
+
+            val speechLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val spokenText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+                    if (!spokenText.isNullOrBlank()) {
+                        statusText = "Syncing..."
+                        sendTranscriptToPhone(context, spokenText) { finalStatus ->
+                            statusText = finalStatus
+                            coroutineScope.launch {
+                                triggerVibration(context)
+                                delay(2000)
+                                statusText = "Tap to record"
+                            }
+                        }
+                    }
+                }
+            }
+
             WearApp(
                 hasPermission = hasPermission,
                 onRequestPermission = { requestPermission.launch(Manifest.permission.RECORD_AUDIO) },
-                triggerVibration = {
+                statusText = statusText,
+                onStartSpeech = {
                     try {
-                        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-                        vibrator?.vibrate(60)
-                    } catch (e: Exception) { }
-                },
-                onStartRecordingService = {
-                    val intent = Intent(context, RecordingService::class.java)
-                    context.startForegroundService(intent)
-                },
-                onStopRecordingService = {
-                    val intent = Intent(context, RecordingService::class.java)
-                    context.stopService(intent)
+                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                        }
+                        speechLauncher.launch(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Voice input not supported on this device.", Toast.LENGTH_LONG).show()
+                    }
                 }
             )
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val intent = Intent(this, RecordingService::class.java)
-        stopService(intent)
+    private fun triggerVibration(context: Context) {
+        try {
+            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            if (vibrator != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    vibrator.vibrate(android.os.VibrationEffect.createOneShot(60, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(60)
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("WearMainActivity", "Vibration failed", e)
+        }
+    }
+
+    private fun sendTranscriptToPhone(context: Context, text: String, onComplete: (String) -> Unit) {
+        val nodeClient = Wearable.getNodeClient(context)
+        nodeClient.connectedNodes.addOnCompleteListener { task ->
+            if (task.isSuccessful && task.result != null && task.result.isNotEmpty()) {
+                val nodes = task.result
+                val messageClient = Wearable.getMessageClient(context)
+                var count = 0
+                var anySent = false
+                for (node in nodes) {
+                    messageClient.sendMessage(node.id, "/reflection_sync", text.toByteArray(Charsets.UTF_8))
+                        .addOnCompleteListener { msgTask ->
+                            count++
+                            if (msgTask.isSuccessful) {
+                                anySent = true
+                            }
+                            if (count == nodes.size) {
+                                if (anySent) {
+                                    onComplete("Reflected!")
+                                } else {
+                                    onComplete("Sync failed")
+                                }
+                            }
+                        }
+                }
+            } else {
+                onComplete("Phone disconnected")
+            }
+        }.addOnFailureListener {
+            onComplete("Sync failed")
+        }
     }
 }
 
@@ -92,50 +155,16 @@ class WearMainActivity : ComponentActivity() {
 fun WearApp(
     hasPermission: Boolean,
     onRequestPermission: () -> Unit,
-    triggerVibration: () -> Unit,
-    onStartRecordingService: () -> Unit,
-    onStopRecordingService: () -> Unit
+    statusText: String,
+    onStartSpeech: () -> Unit
 ) {
-    val initialStatus = stringResource(R.string.tap_to_record)
-    var isRecording by remember { mutableStateOf(false) }
-    var statusText by remember { mutableStateOf(initialStatus) }
-    var countdown by remember { mutableStateOf(60) }
-    val coroutineScope = rememberCoroutineScope()
-
-    val listeningText = stringResource(R.string.listening)
-    val syncingText = stringResource(R.string.syncing)
-    val reflectedText = stringResource(R.string.reflected)
-    val tapToRecordText = stringResource(R.string.tap_to_record)
-
-    LaunchedEffect(isRecording) {
-        if (isRecording) {
-            onStartRecordingService()
-            countdown = 60
-            statusText = listeningText
-            while (countdown > 0 && isRecording) {
-                delay(1000)
-                countdown--
-            }
-            if (countdown == 0 && isRecording) {
-                isRecording = false
-                onStopRecordingService()
-                statusText = syncingText
-                triggerVibration()
-                delay(2000)
-                statusText = reflectedText
-            }
-        } else {
-            onStopRecordingService()
-        }
-    }
-
-    // Infinite scaling for microphone glowing aura
+    val isRecording = statusText == "Syncing..."
     val infiniteTransition = rememberInfiniteTransition(label = "wear_pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
-        targetValue = if (isRecording) 1.3f else 1.08f,
+        targetValue = if (isRecording) 1.25f else 1.05f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = if (isRecording) 700 else 1800, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "wearPulseScale"
@@ -163,7 +192,7 @@ fun WearApp(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = if (isRecording) "00:${countdown.toString().padStart(2, '0')}" else statusText,
+                text = statusText,
                 fontSize = 10.sp,
                 color = if (isRecording) Color(0xFFFF5252) else Color(0xFF9693B8),
                 textAlign = TextAlign.Center
@@ -171,12 +200,10 @@ fun WearApp(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Microphobe circle button
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(90.dp)
             ) {
-                // Pulsing aura ring
                 Box(
                     modifier = Modifier
                         .size(60.dp)
@@ -192,7 +219,6 @@ fun WearApp(
                         )
                 )
 
-                // Main action circle
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -202,28 +228,16 @@ fun WearApp(
                             if (isRecording) Color(0xFFFF5252) else Color(0xFF7A60FF)
                         )
                         .clickable {
-                            triggerVibration()
                             if (!hasPermission) {
                                 onRequestPermission()
                             } else {
-                                if (isRecording) {
-                                    isRecording = false
-                                    coroutineScope.launch {
-                                        statusText = syncingText
-                                        delay(1500)
-                                        statusText = reflectedText
-                                        delay(2000)
-                                        statusText = tapToRecordText
-                                    }
-                                } else {
-                                    isRecording = true
-                                }
+                                onStartSpeech()
                             }
                         }
                 ) {
                     Icon(
-                        imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                        contentDescription = if (isRecording) stringResource(R.string.stop_reflection) else stringResource(R.string.start_reflection),
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = stringResource(R.string.start_reflection),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
@@ -239,8 +253,7 @@ fun PreviewWearApp() {
     WearApp(
         hasPermission = true,
         onRequestPermission = {},
-        triggerVibration = {},
-        onStartRecordingService = {},
-        onStopRecordingService = {}
+        statusText = "Tap to record",
+        onStartSpeech = {}
     )
 }

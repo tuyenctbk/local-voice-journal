@@ -115,6 +115,13 @@ object AdsHelper {
     fun BannerAd(modifier: Modifier = Modifier, isPremium: Boolean = false) {
         if (isPremium) return
         
+        var loadFailed by remember { mutableStateOf(false) }
+
+        if (loadFailed) {
+            BannerWellnessCard(modifier)
+            return
+        }
+
         if (LocalInspectionMode.current) {
             BannerAdPlaceholder(modifier)
             return
@@ -137,6 +144,11 @@ object AdsHelper {
                         )
                     )
                     adUnitId = com.localvoicejournal.mobile.BuildConfig.ADMOB_BANNER_ID
+                    adListener = object : AdListener() {
+                        override fun onAdFailedToLoad(error: LoadAdError) {
+                            loadFailed = true
+                        }
+                    }
                     loadAd(AdRequest.Builder().build())
                 }
             }
@@ -154,6 +166,27 @@ object AdsHelper {
             contentAlignment = Alignment.Center
         ) {
             Text("Ad Banner [Test / Preview]", color = Color(0xFF4C4670), fontSize = 10.sp)
+        }
+    }
+
+    @Composable
+    private fun BannerWellnessCard(modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(Color(0xFF15132B))
+                .border(1.dp, Color(0xFF2C2750), RoundedCornerShape(6.dp))
+                .padding(horizontal = 12.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = "Take a slow breath. Relax.",
+                color = Color(0xFF9E8EFF),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 
@@ -175,7 +208,7 @@ object AdsHelper {
         var loadFailed by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
-            val adLoader = AdLoader.Builder(context, com.localvoicejournal.mobile.BuildConfig.ADMOB_NATIVE_ID) // Native Advanced Test ID
+            val adLoader = AdLoader.Builder(context, com.localvoicejournal.mobile.BuildConfig.ADMOB_NATIVE_ID)
                 .forNativeAd { ad ->
                     nativeAdState = ad
                 }
@@ -195,90 +228,96 @@ object AdsHelper {
         }
 
         val currentAd = nativeAdState
-        if (currentAd != null && !loadFailed) {
-            AndroidView(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF16132C).copy(alpha = 0.4f))
-                    .border(1.dp, Color(0xFF2C2750), RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                factory = { ctx ->
-                    val adView = NativeAdView(ctx)
-                    val container = android.widget.LinearLayout(ctx).apply {
-                        orientation = android.widget.LinearLayout.VERTICAL
-                        layoutParams = android.view.ViewGroup.LayoutParams(
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-                        )
+        when {
+            loadFailed -> {
+                WellnessCard(modifier)
+            }
+            currentAd != null -> {
+                AndroidView(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF16132C).copy(alpha = 0.4f))
+                        .border(1.dp, Color(0xFF2C2750), RoundedCornerShape(12.dp))
+                        .padding(16.dp),
+                    factory = { ctx ->
+                        val adView = NativeAdView(ctx)
+                        val container = android.widget.LinearLayout(ctx).apply {
+                            orientation = android.widget.LinearLayout.VERTICAL
+                            layoutParams = android.view.ViewGroup.LayoutParams(
+                                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                            )
+                        }
+
+                        // Header layout
+                        val header = android.widget.LinearLayout(ctx).apply {
+                            orientation = android.widget.LinearLayout.HORIZONTAL
+                            layoutParams = android.widget.LinearLayout.LayoutParams(
+                                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            gravity = android.view.Gravity.CENTER_VERTICAL
+                        }
+
+                        val titleText = android.widget.TextView(ctx).apply {
+                            setTextColor(android.graphics.Color.WHITE)
+                            textSize = 14f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            layoutParams = android.widget.LinearLayout.LayoutParams(
+                                0,
+                                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1f
+                            )
+                        }
+                        adView.headlineView = titleText
+                        header.addView(titleText)
+
+                        val badge = android.widget.TextView(ctx).apply {
+                            text = "Ad"
+                            setTextColor(android.graphics.Color.WHITE)
+                            textSize = 9f
+                            setTypeface(null, android.graphics.Typeface.BOLD)
+                            setBackgroundColor(android.graphics.Color.parseColor("#7A60FF"))
+                            setPadding(12, 4, 12, 4)
+                        }
+                        header.addView(badge)
+                        container.addView(header)
+
+                        // Spacer
+                        val spacer = android.view.View(ctx).apply {
+                            layoutParams = android.widget.LinearLayout.LayoutParams(
+                                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                8.dpToPx(ctx)
+                            )
+                        }
+                        container.addView(spacer)
+
+                        // Body text
+                        val bodyText = android.widget.TextView(ctx).apply {
+                            setTextColor(android.graphics.Color.parseColor("#C0B3FF"))
+                            textSize = 13f
+                        }
+                        adView.bodyView = bodyText
+                        container.addView(bodyText)
+
+                        adView.addView(container)
+                        adView
+                    },
+                    update = { adView ->
+                        val titleText = adView.headlineView as? android.widget.TextView
+                        val bodyText = adView.bodyView as? android.widget.TextView
+
+                        titleText?.text = currentAd.headline
+                        bodyText?.text = currentAd.body
+
+                        adView.setNativeAd(currentAd)
                     }
-
-                    // Header layout
-                    val header = android.widget.LinearLayout(ctx).apply {
-                        orientation = android.widget.LinearLayout.HORIZONTAL
-                        layoutParams = android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        gravity = android.view.Gravity.CENTER_VERTICAL
-                    }
-
-                    val titleText = android.widget.TextView(ctx).apply {
-                        setTextColor(android.graphics.Color.WHITE)
-                        textSize = 14f
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        layoutParams = android.widget.LinearLayout.LayoutParams(
-                            0,
-                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
-                            1f
-                        )
-                    }
-                    adView.headlineView = titleText
-                    header.addView(titleText)
-
-                    val badge = android.widget.TextView(ctx).apply {
-                        text = "Ad"
-                        setTextColor(android.graphics.Color.WHITE)
-                        textSize = 9f
-                        setTypeface(null, android.graphics.Typeface.BOLD)
-                        setBackgroundColor(android.graphics.Color.parseColor("#7A60FF"))
-                        setPadding(12, 4, 12, 4)
-                    }
-                    header.addView(badge)
-                    container.addView(header)
-
-                    // Spacer
-                    val spacer = android.view.View(ctx).apply {
-                        layoutParams = android.widget.LinearLayout.LayoutParams(
-                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                            8.dpToPx(ctx)
-                        )
-                    }
-                    container.addView(spacer)
-
-                    // Body text
-                    val bodyText = android.widget.TextView(ctx).apply {
-                        setTextColor(android.graphics.Color.parseColor("#C0B3FF"))
-                        textSize = 13f
-                    }
-                    adView.bodyView = bodyText
-                    container.addView(bodyText)
-
-                    adView.addView(container)
-                    adView
-                },
-                update = { adView ->
-                    val titleText = adView.headlineView as? android.widget.TextView
-                    val bodyText = adView.bodyView as? android.widget.TextView
-
-                    titleText?.text = currentAd.headline
-                    bodyText?.text = currentAd.body
-
-                    adView.setNativeAd(currentAd)
-                }
-            )
-        } else {
-            NativeAdPlaceholder(modifier)
+                )
+            }
+            else -> {
+                NativeAdPlaceholder(modifier)
+            }
         }
     }
 
@@ -325,6 +364,52 @@ object AdsHelper {
                     color = Color.White,
                     fontSize = 14.sp,
                     lineHeight = 20.sp
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun WellnessCard(modifier: Modifier = Modifier) {
+        val wellnessTips = listOf(
+            "Take a deep breath. Inhale for 4 seconds, hold for 4, exhale for 4.",
+            "Reflecting today is a gift to your future self.",
+            "Be kind to your mind. Give yourself credit for how far you've come.",
+            "Your thoughts are safe here. Everything is stored locally on your device.",
+            "Pause and relax your shoulders. Let go of the day's tension.",
+            "A daily reflection helps build emotional awareness and resilience."
+        )
+        val selectedTip = remember { wellnessTips.random() }
+        
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    androidx.compose.ui.graphics.Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF1B183A),
+                            Color(0xFF131127)
+                        )
+                    )
+                )
+                .border(1.dp, Color(0xFF38316B), RoundedCornerShape(12.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Text(
+                    text = "WELLNESS REFLECTION",
+                    color = Color(0xFF9E8EFF),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = selectedTip,
+                    color = Color(0xFFC0B3FF),
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
                 )
             }
         }
